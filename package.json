@@ -4,9 +4,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "prettier": "prettier .",
+    "prettier-fix": "prettier . --write"
   },
   "devDependencies": {
+    "prettier": "2.3.2",
     "typescript": "^4.3.2",
     "vite": "^2.4.4"
   }
