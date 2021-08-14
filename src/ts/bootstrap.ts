@@ -1,4 +1,4 @@
-import { onRequestAnimationFrame, pauseGame } from "./game";
+import { onRequestAnimationFrame, pauseGame } from './game';
 
 /**
  * Do one-time setup work here
@@ -10,7 +10,7 @@ function bootstrap() {
   };
   requestAnimationFrame(requestAnimationFrameCallback);
 
-  addEventListener("blur", pauseGame);
+  addEventListener('blur', pauseGame);
 }
 
 export { bootstrap };
