@@ -9,8 +9,8 @@ import {
 
 const universe: (UniverseObject | UniverseCircle)[] = [
   {
-    x: 40,
-    y: 40,
+    x: 300,
+    y: 300,
     mass: 100,
     hasGravitationalForce: false,
     radius: 30,
@@ -18,8 +18,8 @@ const universe: (UniverseObject | UniverseCircle)[] = [
     isFixed: true,
   },
   {
-    x: 30,
-    y: 35,
+    x: 130,
+    y: 305,
     mass: 100,
     hasGravitationalForce: false,
     radius: 5,
@@ -27,7 +27,7 @@ const universe: (UniverseObject | UniverseCircle)[] = [
     isFixed: false,
     velocity: {
       dx: 0.03,
-      dy: 0.01,
+      dy: 0.03,
     },
   },
   {
@@ -38,9 +38,16 @@ const universe: (UniverseObject | UniverseCircle)[] = [
     radius: 5,
     texture: '#0f0',
     isFixed: false,
+    velocity: {
+      dx: 0.03,
+      dy: -0.03,
+    },
   },
 ];
 
+/**
+ * Implementation inspired by https://css-tricks.com/creating-your-own-gravity-and-space-simulator
+ */
 function updateUniverse(
   universe: (UniverseObject | UniverseCircle)[],
   timeDeltaMs: DOMHighResTimeStamp,
@@ -52,9 +59,34 @@ function updateUniverse(
   const moveableObjects = objectsWithMass.filter((object) => !object.isFixed);
 
   moveableObjects.forEach((moveableObject) => {
-    if (moveableObject.velocity === undefined) {
-      return;
-    }
+    moveableObject.velocity = moveableObject.velocity ?? { dx: 0, dy: 0 };
+
+    let accX = 0;
+    let accY = 0;
+    objectsWithMass.forEach((objectWithMass) => {
+      if (moveableObject === objectWithMass) {
+        return;
+      }
+
+      /** Prevent division by zero */
+      const minDelta = 0.00000001;
+      const xDelta = objectWithMass.x - moveableObject.x || minDelta;
+      const yDelta = objectWithMass.y - moveableObject.y || minDelta;
+      const distSq = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
+
+      /** Gravitational Constant */
+      const g = 0.00002;
+      const softeningConstant = 0.15;
+      const f =
+        (g * moveableObject.mass) /
+        (distSq * Math.sqrt(distSq + softeningConstant));
+
+      accX += xDelta * f;
+      accY += yDelta * f;
+    });
+    moveableObject.velocity.dx += accX * timeDeltaMs;
+    moveableObject.velocity.dy += accY * timeDeltaMs;
+
     moveableObject.x += moveableObject.velocity.dx * timeDeltaMs;
     moveableObject.y += moveableObject.velocity.dy * timeDeltaMs;
   });
