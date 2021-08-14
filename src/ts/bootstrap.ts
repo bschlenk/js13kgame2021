@@ -1,3 +1,4 @@
+import { resizeCanvas } from './canvas';
 import { onRequestAnimationFrame, pauseGame } from './game';
 
 /**
@@ -11,6 +12,8 @@ function bootstrap() {
   requestAnimationFrame(requestAnimationFrameCallback);
 
   addEventListener('blur', pauseGame);
+  addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 }
 
 export { bootstrap };
