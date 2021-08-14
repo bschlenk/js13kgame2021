@@ -30,7 +30,6 @@ module.exports = {
     "import/newline-after-import": "error",
     "import/no-default-export": "error",
     "import/no-unresolved": "error",
-    // Enforce import order seen here: https://tiny.amazon.com/1jpvikeb5/githbenmesliblobmastdocsrule
     "import/order": "error",
 
     "unicorn/no-abusive-eslint-disable": "error",
@@ -92,7 +91,6 @@ module.exports = {
       },
       {
         selector: "function",
-        // react functional components use PascalCase
         format: ["camelCase", "PascalCase"],
       },
       {
@@ -100,8 +98,6 @@ module.exports = {
         format: ["PascalCase"],
       },
     ],
-    // we commonly use empty functions to stub out or mock behavior
-    "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-use-before-define": [
