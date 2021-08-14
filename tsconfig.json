@@ -13,5 +13,10 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
   "include": ["./src"]
 }
