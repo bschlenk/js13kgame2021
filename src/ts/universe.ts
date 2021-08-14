@@ -11,6 +11,12 @@ interface UniverseObject {
 interface UniverseObjectWithMass extends UniverseObject {
   mass: number;
   hasGravitationalForce: boolean;
+  isFixed: boolean;
+  /** Pixels per ms */
+  velocity?: {
+    dx: number;
+    dy: number;
+  };
 }
 
 /** A circle that exists in the universe.  */
@@ -25,7 +31,8 @@ function isObjectWithMass(
   const maybeHasMass = universeObject as UniverseObjectWithMass;
   return (
     maybeHasMass.mass !== undefined &&
-    maybeHasMass.hasGravitationalForce !== undefined
+    maybeHasMass.hasGravitationalForce !== undefined &&
+    maybeHasMass.isFixed !== undefined
   );
 }
 
@@ -46,4 +53,5 @@ export {
   UniverseObjectWithMass,
   UniverseCircle,
   isUniverseCircle,
+  isObjectWithMass,
 };
