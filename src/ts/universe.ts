@@ -23,6 +23,8 @@ interface UniverseObjectWithMass extends UniverseObject {
 interface UniverseCircle extends UniverseObjectWithMass {
   radius: number;
   texture: Texture;
+  /** Rotation of object in radians */
+  orientation: number;
 }
 
 function isObjectWithMass(
@@ -43,7 +45,8 @@ function isUniverseCircle(
   return (
     isObjectWithMass(universeObject) &&
     maybeCircle.radius !== undefined &&
-    maybeCircle.texture !== undefined
+    maybeCircle.texture !== undefined &&
+    maybeCircle.orientation !== undefined
   );
 }
 
