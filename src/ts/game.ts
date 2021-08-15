@@ -101,7 +101,11 @@ function updateUniverse(
 
     // Search each of our objects to ensure we don't have any collisions
     universe.forEach((universeObject) => {
-      if (universeObject !== moveableObject) {
+      if (
+        universeObject !== moveableObject &&
+        isUniverseCircle(universeObject) &&
+        isUniverseCircle(moveableObject)
+      ) {
         const minDistance = moveableObject.radius + universeObject.radius;
         if (
           Math.abs(moveableObject.x - universeObject.x) < minDistance &&
