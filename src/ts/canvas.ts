@@ -6,4 +6,8 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
-export { canvas, canvasContext, resizeCanvas };
+function clearCanvas() {
+  canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+export { canvas, canvasContext, resizeCanvas, clearCanvas };

@@ -1,4 +1,5 @@
-import { canvas, canvasContext } from './canvas';
+import { canvas, canvasContext, clearCanvas } from './canvas';
+import { renderPauseMenu } from './menu';
 import {
   UniverseObject,
   UniverseCircle,
@@ -130,10 +131,16 @@ function updateUniverse(
   });
 }
 
+let isPaused = false;
+
 let lastFrame: DOMHighResTimeStamp = 0;
 
 function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
-  canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+  if (isPaused) {
+    renderPauseMenu();
+    return;
+  }
+  clearCanvas();
 
   // Temporary code to randomly add in asteroids every second
   if (Math.floor(time / 1000) - Math.floor(lastFrame / 1000)) {
@@ -178,7 +185,27 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
 }
 
 function pauseGame() {
-  // Pause?
+  isPaused = true;
 }
 
-export { onRequestAnimationFrame, pauseGame };
+function resumeGame() {
+  isPaused = false;
+}
+
+function onKeyDown(e: KeyboardEvent) {
+  switch (e.key) {
+    case 'Escape': {
+      pauseGame();
+      return;
+    }
+    case ' ': {
+      resumeGame();
+      return;
+    }
+    default: {
+      console.debug('Unhandled keypress', e.key);
+    }
+  }
+}
+
+export { onRequestAnimationFrame, pauseGame, resumeGame, onKeyDown };

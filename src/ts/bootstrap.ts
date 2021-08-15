@@ -1,5 +1,5 @@
 import { resizeCanvas } from './canvas';
-import { onRequestAnimationFrame, pauseGame } from './game';
+import { onKeyDown, onRequestAnimationFrame, pauseGame } from './game';
 
 /**
  * Do one-time setup work here
@@ -12,6 +12,7 @@ function bootstrap() {
   requestAnimationFrame(requestAnimationFrameCallback);
 
   addEventListener('blur', pauseGame);
+  addEventListener('keydown', onKeyDown);
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
 }
