@@ -1,4 +1,9 @@
-import { canvas, canvasContext, clearCanvas } from './canvas';
+import {
+  canvas,
+  canvasContext,
+  clearCanvas,
+  createVerticalGradient,
+} from './canvas';
 import { renderPauseMenu } from './menu';
 import {
   UniverseObject,
@@ -17,6 +22,7 @@ const universe: (UniverseObject | UniverseCircle)[] = [
     radius: 30,
     texture: '#f00',
     isFixed: true,
+    orientation: Math.PI * 0.5,
   },
   {
     x: 600,
@@ -26,11 +32,12 @@ const universe: (UniverseObject | UniverseCircle)[] = [
     radius: 30,
     texture: '#33f',
     isFixed: true,
+    orientation: 0,
   },
   {
     x: 130,
     y: 305,
-    mass: 100,
+    mass: 5,
     hasGravitationalForce: false,
     radius: 5,
     texture: '#0f0',
@@ -39,11 +46,12 @@ const universe: (UniverseObject | UniverseCircle)[] = [
       dx: 0.03,
       dy: 0.03,
     },
+    orientation: 0,
   },
   {
     x: 50,
     y: 35,
-    mass: 100,
+    mass: 5,
     hasGravitationalForce: false,
     radius: 5,
     texture: '#0f0',
@@ -52,6 +60,7 @@ const universe: (UniverseObject | UniverseCircle)[] = [
       dx: 0.03,
       dy: -0.03,
     },
+    orientation: 0,
   },
 ];
 
@@ -96,6 +105,10 @@ function updateUniverse(
     });
     moveableObject.velocity.dx += accX * timeDeltaMs;
     moveableObject.velocity.dy += accY * timeDeltaMs;
+
+    if (isUniverseCircle(moveableObject)) {
+      moveableObject.orientation = Math.atan2(accY, accX);
+    }
 
     moveableObject.x += moveableObject.velocity.dx * timeDeltaMs;
     moveableObject.y += moveableObject.velocity.dy * timeDeltaMs;
@@ -147,7 +160,7 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
     universe.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      mass: 100,
+      mass: 5,
       hasGravitationalForce: false,
       radius: 5,
       texture: '#0f0',
@@ -156,6 +169,7 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
         dx: 0.03,
         dy: -0.03,
       },
+      orientation: 0,
     });
   }
 
@@ -171,7 +185,15 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   universe.forEach((universeObject) => {
     if (isUniverseCircle(universeObject)) {
       canvasContext.beginPath();
-      canvasContext.fillStyle = universeObject.texture;
+      canvasContext.fillStyle = createVerticalGradient(
+        universeObject.texture,
+        '#000',
+        universeObject.x,
+        universeObject.y,
+        universeObject.radius * 2,
+        universeObject.radius * 2,
+        universeObject.orientation,
+      );
       canvasContext.arc(
         universeObject.x,
         universeObject.y,
