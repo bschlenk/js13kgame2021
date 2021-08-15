@@ -18,6 +18,15 @@ const universe: (UniverseObject | UniverseCircle)[] = [
     isFixed: true,
   },
   {
+    x: 600,
+    y: 300,
+    mass: 100,
+    hasGravitationalForce: false,
+    radius: 30,
+    texture: '#33f',
+    isFixed: true,
+  },
+  {
     x: 130,
     y: 305,
     mass: 100,
@@ -89,6 +98,35 @@ function updateUniverse(
 
     moveableObject.x += moveableObject.velocity.dx * timeDeltaMs;
     moveableObject.y += moveableObject.velocity.dy * timeDeltaMs;
+
+    // Search each of our objects to ensure we don't have any collisions
+    universe.forEach((universeObject) => {
+      if (
+        universeObject !== moveableObject &&
+        isUniverseCircle(universeObject) &&
+        isUniverseCircle(moveableObject)
+      ) {
+        const minDistance = moveableObject.radius + universeObject.radius;
+        if (
+          Math.abs(moveableObject.x - universeObject.x) < minDistance &&
+          Math.abs(moveableObject.y - universeObject.y) < minDistance
+        ) {
+          console.log('Collision!');
+          const index = universe.indexOf(moveableObject);
+          if (index > -1) {
+            universe.splice(index, 1);
+          }
+
+          // Check if the other object should go away too
+          if (!universeObject.isFixed) {
+            const index = universe.indexOf(universeObject);
+            if (index > -1) {
+              universe.splice(index, 1);
+            }
+          }
+        }
+      }
+    });
   });
 }
 
@@ -96,6 +134,23 @@ let lastFrame: DOMHighResTimeStamp = 0;
 
 function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Temporary code to randomly add in asteroids every second
+  if (Math.floor(time / 1000) - Math.floor(lastFrame / 1000)) {
+    universe.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      mass: 100,
+      hasGravitationalForce: false,
+      radius: 5,
+      texture: '#0f0',
+      isFixed: false,
+      velocity: {
+        dx: 0.03,
+        dy: -0.03,
+      },
+    });
+  }
 
   const timeSinceLastFrame = time - lastFrame;
   lastFrame = time;
