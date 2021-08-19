@@ -10,10 +10,31 @@ import {
   UniverseCircle,
   isUniverseCircle,
   isObjectWithMass,
-  UniverseObjectWithMass,
+  UniversePlayer,
+  isPlayer,
 } from './universe';
 
-const universe: (UniverseObject | UniverseCircle)[] = [
+const MAX_JUMP_CHARGE = 100;
+const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
+const JUMP_CHARGE_RATE = (MAX_JUMP_CHARGE * 2) / JUMP_CHARGE_CYCLE_TIME_MS;
+
+let isSpacePressed = false;
+
+const universe: (UniverseObject | UniverseCircle | UniversePlayer)[] = [
+  {
+    x: 300,
+    y: 200,
+    mass: 100,
+    hasGravitationalForce: false,
+    radius: 10,
+    texture: '#000',
+    isFixed: true,
+    orientation: Math.PI * 0.5,
+    isPlayer: true,
+    jumpCharge: 0,
+    jumpChargeDirection: 1,
+    velocity: { dx: 0, dy: 0 },
+  },
   {
     x: 300,
     y: 300,
@@ -71,10 +92,36 @@ function updateUniverse(
   universe: (UniverseObject | UniverseCircle)[],
   timeDeltaMs: DOMHighResTimeStamp,
 ) {
+  const player = universe.find(isPlayer)!;
+  if (isSpacePressed) {
+    if (player.isFixed) {
+      // we are stationary, that means we can press space
+      const increment =
+        player.jumpChargeDirection * JUMP_CHARGE_RATE * timeDeltaMs;
+      let newCharge = player.jumpCharge + increment;
+      if (newCharge > 100) {
+        player.jumpChargeDirection = -1;
+        newCharge -= newCharge - 100;
+      } else if (newCharge < 0) {
+        player.jumpChargeDirection = 1;
+        newCharge = Math.abs(newCharge);
+      }
+
+      player.jumpCharge = newCharge;
+    }
+  } else {
+    const charge = player.jumpCharge;
+    // if charge is non-zero, then we have just released space bar
+    if (charge) {
+      player.jumpCharge = 0;
+      player.jumpChargeDirection = 1;
+      player.isFixed = false;
+      player.velocity.dy = charge * 0.002;
+    }
+  }
+
   // This should be re-used later to calculate acceleration for moveable objects
-  const objectsWithMass: UniverseObjectWithMass[] = universe.flatMap((object) =>
-    isObjectWithMass(object) ? [object] : [],
-  );
+  const objectsWithMass = universe.filter(isObjectWithMass);
   const moveableObjects = objectsWithMass.filter((object) => !object.isFixed);
 
   moveableObjects.forEach((moveableObject) => {
@@ -115,6 +162,9 @@ function updateUniverse(
 
     // Search each of our objects to ensure we don't have any collisions
     universe.forEach((universeObject) => {
+      // TODO
+      if (isPlayer(moveableObject) || isPlayer(universeObject)) return;
+
       if (
         universeObject !== moveableObject &&
         isUniverseCircle(universeObject) &&
@@ -203,6 +253,17 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
       );
       canvasContext.fill();
     }
+
+    if (isPlayer(universeObject)) {
+      const { x, y, jumpCharge: charge, radius } = universeObject;
+
+      if (!charge) return;
+
+      canvasContext.fillStyle = '#e43';
+      const xPos = x + radius + 10;
+      const yPos = y - charge;
+      canvasContext.fillRect(xPos, yPos, 10, charge);
+    }
   });
 }
 
@@ -221,7 +282,11 @@ function onKeyDown(e: KeyboardEvent) {
       return;
     }
     case ' ': {
-      resumeGame();
+      e.preventDefault();
+      if (isPaused) {
+        resumeGame();
+      }
+      isSpacePressed = true;
       return;
     }
     default: {
@@ -230,4 +295,13 @@ function onKeyDown(e: KeyboardEvent) {
   }
 }
 
-export { onRequestAnimationFrame, pauseGame, resumeGame, onKeyDown };
+function onKeyUp(e: KeyboardEvent) {
+  switch (e.key) {
+    case ' ': {
+      e.preventDefault();
+      isSpacePressed = false;
+    }
+  }
+}
+
+export { onRequestAnimationFrame, pauseGame, resumeGame, onKeyDown, onKeyUp };

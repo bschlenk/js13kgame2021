@@ -7,16 +7,18 @@ interface UniverseObject {
   y: number;
 }
 
+interface Velocity {
+  dx: number;
+  dy: number;
+}
+
 /** An object with mass, but does not require that it takes up space. E.g. black holes */
 interface UniverseObjectWithMass extends UniverseObject {
   mass: number;
   hasGravitationalForce: boolean;
   isFixed: boolean;
   /** Pixels per ms */
-  velocity?: {
-    dx: number;
-    dy: number;
-  };
+  velocity?: Velocity;
 }
 
 /** A circle that exists in the universe.  */
@@ -25,6 +27,13 @@ interface UniverseCircle extends UniverseObjectWithMass {
   texture: Texture;
   /** Rotation of object in radians */
   orientation: number;
+}
+
+interface UniversePlayer extends UniverseCircle {
+  isPlayer: true;
+  jumpCharge: number;
+  jumpChargeDirection: 1 | -1;
+  velocity: Velocity;
 }
 
 function isObjectWithMass(
@@ -50,11 +59,20 @@ function isUniverseCircle(
   );
 }
 
+function isPlayer(
+  universeObject: UniverseObject,
+): universeObject is UniversePlayer {
+  const maybePlayer = universeObject as UniversePlayer;
+  return maybePlayer.isPlayer;
+}
+
 export {
   Texture,
   UniverseObject,
   UniverseObjectWithMass,
   UniverseCircle,
+  UniversePlayer,
   isUniverseCircle,
   isObjectWithMass,
+  isPlayer,
 };
