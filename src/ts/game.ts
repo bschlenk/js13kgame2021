@@ -5,14 +5,15 @@ import {
   clearCanvas,
   createVerticalGradient,
 } from './canvas';
+import { doCirclesIntersect } from './collision';
 import { renderPauseMenu } from './menu';
+import { handlePlayerInteraction } from './player';
 import {
-  UniverseObject,
-  UniverseCircle,
   isUniverseCircle,
   isObjectWithMass,
-  UniversePlayer,
   isPlayer,
+  Universe,
+  UniverseCollectible,
 } from './universe';
 
 const MAX_JUMP_CHARGE = 100;
@@ -23,80 +24,91 @@ let isSpacePressed = false;
 
 const background = new Background();
 
-const universe: (UniverseObject | UniverseCircle | UniversePlayer)[] = [
-  {
-    x: 300,
-    y: 200,
-    mass: 100,
-    hasGravitationalForce: false,
-    radius: 10,
-    texture: '#fff',
-    isFixed: true,
-    orientation: Math.PI * 0.5,
-    isPlayer: true,
-    jumpCharge: 0,
-    jumpChargeDirection: 1,
-    velocity: { dx: 0, dy: 0 },
-  },
-  {
-    x: 300,
-    y: 300,
-    mass: 100,
-    hasGravitationalForce: false,
-    radius: 30,
-    texture: '#f00',
-    isFixed: true,
-    orientation: Math.PI * 0.5,
-  },
-  {
-    x: 600,
-    y: 300,
-    mass: 100,
-    hasGravitationalForce: false,
-    radius: 30,
-    texture: '#33f',
-    isFixed: true,
-    orientation: 0,
-  },
-  {
-    x: 130,
-    y: 305,
-    mass: 5,
-    hasGravitationalForce: false,
-    radius: 5,
-    texture: '#0f0',
-    isFixed: false,
-    velocity: {
-      dx: 0.03,
-      dy: 0.03,
+const universe: Universe = {
+  points: 0,
+  objects: [
+    {
+      x: 300,
+      y: 200,
+      mass: 100,
+      hasGravitationalForce: false,
+      radius: 10,
+      texture: '#fff',
+      isFixed: true,
+      orientation: Math.PI * 0.5,
+      isPlayer: true,
+      jumpCharge: 0,
+      jumpChargeDirection: 1,
+      velocity: { dx: 0, dy: 0 },
     },
-    orientation: 0,
-  },
-  {
-    x: 50,
-    y: 35,
-    mass: 5,
-    hasGravitationalForce: false,
-    radius: 5,
-    texture: '#0f0',
-    isFixed: false,
-    velocity: {
-      dx: 0.03,
-      dy: -0.03,
+    {
+      x: 300,
+      y: 300,
+      mass: 100,
+      hasGravitationalForce: false,
+      radius: 30,
+      texture: '#f00',
+      isFixed: true,
+      orientation: Math.PI * 0.5,
     },
-    orientation: 0,
-  },
-];
+    {
+      x: 600,
+      y: 300,
+      mass: 100,
+      hasGravitationalForce: false,
+      radius: 30,
+      texture: '#33f',
+      isFixed: true,
+      orientation: 0,
+    },
+    {
+      x: 130,
+      y: 305,
+      mass: 5,
+      hasGravitationalForce: false,
+      radius: 5,
+      texture: '#0f0',
+      isFixed: false,
+      velocity: {
+        dx: 0.03,
+        dy: 0.03,
+      },
+    },
+    {
+      x: 50,
+      y: 35,
+      mass: 5,
+      hasGravitationalForce: false,
+      radius: 5,
+      texture: '#0f0',
+      isFixed: false,
+      velocity: {
+        dx: 0.03,
+        dy: -0.03,
+      },
+      orientation: 0,
+    },
+    ...[...new Array(10)].map<UniverseCollectible>((_) => ({
+      x: Math.random() * 1000,
+      y: Math.random() * 1000,
+      points: 1,
+      radius: 20,
+      texture: '#fff',
+      orientation: 0,
+      mass: 0,
+      hasGravitationalForce: false,
+      isFixed: true,
+    })),
+  ],
+};
 
 /**
  * Implementation inspired by https://css-tricks.com/creating-your-own-gravity-and-space-simulator
  */
-function updateUniverse(
-  universe: (UniverseObject | UniverseCircle)[],
-  timeDeltaMs: DOMHighResTimeStamp,
-) {
+function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
+  const universeObjects = universe.objects;
   background.update(timeDeltaMs);
-  const player = universe.find(isPlayer)!;
+  const player = universeObjects.find(isPlayer)!;
   if (isSpacePressed) {
     if (player.isFixed) {
       // we are stationary, that means we can press space
@@ -125,7 +137,7 @@ function updateUniverse(
   }
 
   // This should be re-used later to calculate acceleration for moveable objects
-  const objectsWithMass = universe.filter(isObjectWithMass);
+  const objectsWithMass = universeObjects.filter(isObjectWithMass);
   const moveableObjects = objectsWithMass.filter((object) => !object.isFixed);
 
   moveableObjects.forEach((moveableObject) => {
@@ -165,31 +177,37 @@ function updateUniverse(
     moveableObject.y += moveableObject.velocity.dy * timeDeltaMs;
 
     // Search each of our objects to ensure we don't have any collisions
-    universe.forEach((universeObject) => {
-      // TODO
-      if (isPlayer(moveableObject) || isPlayer(universeObject)) return;
+    universeObjects.forEach((universeObject) => {
+      if (universeObject === moveableObject || isPlayer(universeObject)) {
+        return;
+      }
+
+      if (isPlayer(moveableObject)) {
+        if (
+          isUniverseCircle(universeObject) &&
+          doCirclesIntersect(moveableObject, universeObject)
+        ) {
+          handlePlayerInteraction(moveableObject, universeObject, universe);
+        }
+        return;
+      }
 
       if (
-        universeObject !== moveableObject &&
         isUniverseCircle(universeObject) &&
         isUniverseCircle(moveableObject)
       ) {
-        const minDistance = moveableObject.radius + universeObject.radius;
-        if (
-          Math.abs(moveableObject.x - universeObject.x) < minDistance &&
-          Math.abs(moveableObject.y - universeObject.y) < minDistance
-        ) {
+        if (doCirclesIntersect(universeObject, moveableObject)) {
           console.log('Collision!');
-          const index = universe.indexOf(moveableObject);
+          const index = universeObjects.indexOf(moveableObject);
           if (index > -1) {
-            universe.splice(index, 1);
+            universeObjects.splice(index, 1);
           }
 
           // Check if the other object should go away too
           if (!universeObject.isFixed) {
-            const index = universe.indexOf(universeObject);
+            const index = universeObjects.indexOf(universeObject);
             if (index > -1) {
-              universe.splice(index, 1);
+              universeObjects.splice(index, 1);
             }
           }
         }
@@ -209,9 +227,11 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   }
   clearCanvas();
 
+  const universeObjects = universe.objects;
+
   // Temporary code to randomly add in asteroids every second
   if (Math.floor(time / 1000) - Math.floor(lastFrame / 1000)) {
-    universe.push({
+    universeObjects.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       mass: 5,
@@ -237,7 +257,7 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
 
   // Draw
   background.render();
-  universe.forEach((universeObject) => {
+  universeObjects.forEach((universeObject) => {
     if (isUniverseCircle(universeObject)) {
       canvasContext.beginPath();
       canvasContext.fillStyle = createVerticalGradient(
@@ -270,6 +290,13 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
       canvasContext.fillRect(xPos, yPos, 10, charge);
     }
   });
+  drawPoints(universe);
+}
+
+function drawPoints(universe: Universe) {
+  canvasContext.fillStyle = '#eee';
+  canvasContext.font = '30px sans-serif';
+  canvasContext.fillText(`Points: ${universe.points}`, 10, 40);
 }
 
 function pauseGame() {
