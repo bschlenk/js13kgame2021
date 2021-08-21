@@ -29,6 +29,10 @@ interface UniverseCircle extends UniverseObjectWithMass {
   orientation: number;
 }
 
+interface UniverseCollectible extends UniverseCircle {
+  points: number;
+}
+
 interface UniversePlayer extends UniverseCircle {
   isPlayer: true;
   jumpCharge: number;
@@ -59,6 +63,15 @@ function isUniverseCircle(
   );
 }
 
+function isUniverseCollectible(
+  universeObject: UniverseObject,
+): universeObject is UniverseCollectible {
+  const maybeCollectible = universeObject as UniverseCollectible;
+  return (
+    isUniverseCircle(universeObject) && maybeCollectible.points !== undefined
+  );
+}
+
 function isPlayer(
   universeObject: UniverseObject,
 ): universeObject is UniversePlayer {
@@ -66,12 +79,25 @@ function isPlayer(
   return maybePlayer.isPlayer;
 }
 
+interface Universe {
+  points: number;
+  objects: (
+    | UniverseObject
+    | UniverseCircle
+    | UniversePlayer
+    | UniverseCollectible
+  )[];
+}
+
 export {
+  Universe,
   Texture,
   UniverseObject,
   UniverseObjectWithMass,
   UniverseCircle,
   UniversePlayer,
+  UniverseCollectible,
+  isUniverseCollectible,
   isUniverseCircle,
   isObjectWithMass,
   isPlayer,
