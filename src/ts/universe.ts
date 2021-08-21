@@ -5,6 +5,7 @@ type Texture = string;
 interface UniverseObject {
   x: number;
   y: number;
+  type: string;
 }
 
 interface Velocity {
@@ -31,6 +32,11 @@ interface UniverseCircle extends UniverseObjectWithMass {
 
 interface UniverseCollectible extends UniverseCircle {
   points: number;
+  originX: number;
+  originY: number;
+  orbitSpeed: number; // Radians/sec
+  orbitLocation: number; // Radians
+  altitude: number;
 }
 
 interface UniversePlayer extends UniverseCircle {
