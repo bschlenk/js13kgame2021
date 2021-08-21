@@ -1,13 +1,16 @@
 const canvas = document.getElementsByTagName('canvas')[0];
 const canvasContext = canvas.getContext('2d')!;
 
+const BACKGROUND_COLOR = '#121212';
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
 
 function clearCanvas() {
-  canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+  canvasContext.fillStyle = BACKGROUND_COLOR;
+  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 /**
@@ -39,4 +42,5 @@ export {
   resizeCanvas,
   createVerticalGradient,
   clearCanvas,
+  BACKGROUND_COLOR,
 };

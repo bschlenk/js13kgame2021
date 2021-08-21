@@ -1,3 +1,4 @@
+import { Background } from './background';
 import {
   canvas,
   canvasContext,
@@ -20,6 +21,8 @@ const JUMP_CHARGE_RATE = (MAX_JUMP_CHARGE * 2) / JUMP_CHARGE_CYCLE_TIME_MS;
 
 let isSpacePressed = false;
 
+const background = new Background();
+
 const universe: (UniverseObject | UniverseCircle | UniversePlayer)[] = [
   {
     x: 300,
@@ -27,7 +30,7 @@ const universe: (UniverseObject | UniverseCircle | UniversePlayer)[] = [
     mass: 100,
     hasGravitationalForce: false,
     radius: 10,
-    texture: '#000',
+    texture: '#fff',
     isFixed: true,
     orientation: Math.PI * 0.5,
     isPlayer: true,
@@ -92,6 +95,7 @@ function updateUniverse(
   universe: (UniverseObject | UniverseCircle)[],
   timeDeltaMs: DOMHighResTimeStamp,
 ) {
+  background.update(timeDeltaMs);
   const player = universe.find(isPlayer)!;
   if (isSpacePressed) {
     if (player.isFixed) {
@@ -232,6 +236,7 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   updateUniverse(universe, timeSinceLastFrame);
 
   // Draw
+  background.render();
   universe.forEach((universeObject) => {
     if (isUniverseCircle(universeObject)) {
       canvasContext.beginPath();

@@ -4,7 +4,7 @@ function renderPauseMenu() {
   clearCanvas();
   canvasContext.fillStyle = '#222';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-  drawCenterText('Plannet Hoppers', 6, 150);
+  drawCenterText('Planet Hoppers', 6, 150);
   drawCenterText('Press Space to Resume', 3, 300);
 }
 
