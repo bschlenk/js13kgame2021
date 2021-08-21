@@ -11,6 +11,7 @@ import { handlePlayerInteraction } from './player';
 import {
   isUniverseCircle,
   isObjectWithMass,
+  isJunk,
   isPlayer,
   Universe,
   UniverseCollectible,
@@ -164,7 +165,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
   const moveableObjects = objectsWithMass.filter((object) => !object.isFixed);
 
   moveableObjects.forEach((moveableObject) => {
-    if (moveableObject.type === 'junk') {
+    if (isJunk(moveableObject)) {
       updateJunk(moveableObject, timeDeltaMs);
       return;
     }
@@ -272,6 +273,7 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
         dy: -0.03,
       },
       orientation: 0,
+      type: 'asteroid',
     });
   }
 
@@ -327,7 +329,7 @@ function drawPoints(universe: Universe) {
   canvasContext.fillText(`Points: ${universe.points}`, 10, 40);
 }
 
-function updateJunk(junk: UniverseCollectible, timeDeltaMs) {
+function updateJunk(junk: UniverseCollectible, timeDeltaMs: number) {
   junk.orbitLocation += junk.orbitSpeed * (timeDeltaMs / 1000);
   junk.x = junk.altitude * Math.cos(junk.orbitLocation) + junk.originX;
   junk.y = junk.altitude * Math.sin(junk.orbitLocation) + junk.originY;
