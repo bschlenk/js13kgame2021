@@ -1,9 +1,4 @@
-import {
-  isUniverseCollectible,
-  Universe,
-  UniverseCircle,
-  UniversePlayer,
-} from './universe';
+import { isJunk, Universe, UniverseCircle, UniversePlayer } from './universe';
 import { removeFromArray } from './utils';
 
 export function handlePlayerInteraction(
@@ -12,8 +7,7 @@ export function handlePlayerInteraction(
   universe: Universe,
 ) {
   const universeObjects = universe.objects;
-
-  if (isUniverseCollectible(circle)) {
+  if (isJunk(circle)) {
     universe.points += circle.points;
     removeFromArray(universeObjects, circle);
   }
