@@ -40,6 +40,7 @@ const universe: Universe = {
       jumpCharge: 0,
       jumpChargeDirection: 1,
       velocity: { dx: 0, dy: 0 },
+      type: 'player',
     },
     {
       x: 300,
@@ -50,6 +51,7 @@ const universe: Universe = {
       texture: '#f00',
       isFixed: true,
       orientation: Math.PI * 0.5,
+      type: 'planet',
     },
     {
       x: 600,
@@ -60,6 +62,7 @@ const universe: Universe = {
       texture: '#33f',
       isFixed: true,
       orientation: 0,
+      type: 'planet',
     },
     {
       x: 130,
@@ -73,6 +76,7 @@ const universe: Universe = {
         dx: 0.03,
         dy: 0.03,
       },
+      type: 'asteroid',
     },
     {
       x: 50,
@@ -87,20 +91,39 @@ const universe: Universe = {
         dy: -0.03,
       },
       orientation: 0,
+      type: 'asteroid',
     },
-    ...[...new Array(10)].map<UniverseCollectible>((_) => ({
-      x: Math.random() * 1000,
-      y: Math.random() * 1000,
+  ],
+};
+
+// Generate space junk with planets as the base
+universe.objects.forEach((element) => {
+  if (element.type === 'planet') {
+    // Generate anywhere from 10-20 particles randomly
+    const particleCount = Math.floor(Math.random() * 10 + 10);
+    const junkInTheTrunk = [
+      ...new Array(particleCount),
+    ].map<UniverseCollectible>((_) => ({
+      x: 0,
+      y: 0,
+      originX: element.x,
+      originY: element.y,
+      // Allow the orbit speed to be positve or negative
+      orbitSpeed: (Math.random() * 0.5 + 0.5) * (Math.random() < 0.5 ? -1 : 1),
+      orbitLocation: Math.random() * Math.PI * 2,
+      altitude: Math.random() * 50 + 100,
       points: 1,
-      radius: 20,
+      radius: 3,
       texture: '#fff',
       orientation: 0,
       mass: 0,
       hasGravitationalForce: false,
-      isFixed: true,
-    })),
-  ],
-};
+      isFixed: false,
+      type: 'junk',
+    }));
+    universe.objects = universe.objects.concat(junkInTheTrunk);
+  }
+});
 
 /**
  * Implementation inspired by https://css-tricks.com/creating-your-own-gravity-and-space-simulator
@@ -141,6 +164,11 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
   const moveableObjects = objectsWithMass.filter((object) => !object.isFixed);
 
   moveableObjects.forEach((moveableObject) => {
+    if (moveableObject.type === 'junk') {
+      updateJunk(moveableObject, timeDeltaMs);
+      return;
+    }
+
     moveableObject.velocity = moveableObject.velocity ?? { dx: 0, dy: 0 };
 
     let accX = 0;
@@ -297,6 +325,12 @@ function drawPoints(universe: Universe) {
   canvasContext.fillStyle = '#eee';
   canvasContext.font = '30px sans-serif';
   canvasContext.fillText(`Points: ${universe.points}`, 10, 40);
+}
+
+function updateJunk(junk: UniverseCollectible, timeDeltaMs) {
+  junk.orbitLocation += junk.orbitSpeed * (timeDeltaMs / 1000);
+  junk.x = junk.altitude * Math.cos(junk.orbitLocation) + junk.originX;
+  junk.y = junk.altitude * Math.sin(junk.orbitLocation) + junk.originY;
 }
 
 function pauseGame() {
