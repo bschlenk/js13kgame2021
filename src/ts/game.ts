@@ -8,10 +8,11 @@ import {
 import { doCirclesIntersect } from './collision';
 import { renderPauseMenu } from './menu';
 import { handlePlayerInteraction } from './player';
+import { updateCollectible } from './update';
 import {
   isUniverseCircle,
   isObjectWithMass,
-  isJunk,
+  isCollectible,
   isPlayer,
   Universe,
   UniverseCollectible,
@@ -111,7 +112,7 @@ universe.objects.forEach((element) => {
       originX: element.x,
       originY: element.y,
       // Allow the orbit speed to be positve or negative
-      orbitSpeed: (Math.random() * 0.5 + 0.5) * (Math.random() < 0.5 ? -1 : 1),
+      orbitSpeed: (Math.random() * 0.1 + 0.1) * (Math.random() < 0.5 ? -1 : 1),
       orbitLocation: Math.random() * Math.PI * 2,
       altitude: Math.random() * 50 + 100,
       points: 1,
@@ -121,7 +122,7 @@ universe.objects.forEach((element) => {
       mass: 0,
       hasGravitationalForce: false,
       isFixed: false,
-      type: 'junk',
+      type: 'collectible',
     }));
     universe.objects = universe.objects.concat(junkInTheTrunk);
   }
@@ -166,8 +167,8 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
   const moveableObjects = objectsWithMass.filter((object) => !object.isFixed);
 
   moveableObjects.forEach((moveableObject) => {
-    if (isJunk(moveableObject)) {
-      updateJunk(moveableObject, timeDeltaMs);
+    if (isCollectible(moveableObject)) {
+      updateCollectible(moveableObject, timeDeltaMs);
       return;
     }
 
@@ -322,12 +323,6 @@ function drawPoints(universe: Universe) {
   canvasContext.fillStyle = '#eee';
   canvasContext.font = '30px sans-serif';
   canvasContext.fillText(`Points: ${universe.points}`, 10, 40);
-}
-
-function updateJunk(junk: UniverseCollectible, timeDeltaMs: number) {
-  junk.orbitLocation += junk.orbitSpeed * (timeDeltaMs / 1000);
-  junk.x = junk.altitude * Math.cos(junk.orbitLocation) + junk.originX;
-  junk.y = junk.altitude * Math.sin(junk.orbitLocation) + junk.originY;
 }
 
 function pauseGame() {

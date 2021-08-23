@@ -69,10 +69,10 @@ function isUniverseCircle(
   );
 }
 
-function isJunk(
+function isCollectible(
   universeObject: UniverseObject,
 ): universeObject is UniverseCollectible {
-  return universeObject.type === 'junk';
+  return universeObject.type === 'collectible';
 }
 
 function isPlayer(
@@ -100,7 +100,7 @@ export {
   UniverseCircle,
   UniversePlayer,
   UniverseCollectible,
-  isJunk,
+  isCollectible,
   isUniverseCircle,
   isObjectWithMass,
   isPlayer,
