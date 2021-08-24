@@ -1,12 +1,14 @@
 /** The texture to render as. This may become a more complicated type union in the future */
 type Texture = string;
 
-/** The most basic building block of objects in the universe */
-interface UniverseObject {
+interface Position {
   x: number;
   y: number;
   type: string;
 }
+
+/** The most basic building block of objects in the universe */
+type UniverseObject = Position;
 
 interface Velocity {
   dx: number;
@@ -44,6 +46,7 @@ interface UniversePlayer extends UniverseCircle {
   jumpCharge: number;
   jumpChargeDirection: 1 | -1;
   velocity: Velocity;
+  planet: UniverseCircle | null;
 }
 
 function isObjectWithMass(
@@ -93,6 +96,7 @@ interface Universe {
 }
 
 export {
+  Position,
   Universe,
   Texture,
   UniverseObject,
