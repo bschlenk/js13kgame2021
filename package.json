@@ -10,8 +10,8 @@
     "prettier-fix": "prettier . --write",
     "eslint": "eslint .",
     "eslint-fix": "eslint . --fix",
-    "check": "npm run prettier && npm run eslint",
-    "format": "npm run prettier-fix && npm run eslint-fix",
+    "check": "npm run eslint && npm run prettier",
+    "format": "npm run eslint-fix && npm run prettier-fix",
     "check-build-size": "ts-node scripts/check_build_size.ts",
     "release": "npm run check && npm run build && npm run check-build-size"
   },
