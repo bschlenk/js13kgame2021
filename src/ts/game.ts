@@ -15,7 +15,7 @@ import {
   Universe,
   UniverseCollectible,
 } from './universe';
-import { removeFromArray } from './utils';
+import { removeFromArray, vecFromAngleAndScale } from './utils';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
@@ -35,7 +35,7 @@ const universe: Universe = {
       hasGravitationalForce: false,
       radius: 10,
       texture: '#fff',
-      isFixed: true,
+      isFixed: false,
       orientation: Math.PI * 0.5,
       isPlayer: true,
       jumpCharge: 0,
@@ -133,7 +133,9 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       player.jumpCharge = 0;
       player.jumpChargeDirection = 1;
       player.isFixed = false;
-      player.velocity.dy = charge * 0.002;
+      const { x, y } = vecFromAngleAndScale(player.orientation, charge * 0.002);
+      player.velocity.dx = x;
+      player.velocity.dy = y;
     }
   }
 

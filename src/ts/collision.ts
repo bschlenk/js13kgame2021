@@ -1,11 +1,10 @@
 import { UniverseCircle } from './universe';
+import { vecDistance } from './utils';
 
 export function doCirclesIntersect(
   a: UniverseCircle,
   b: UniverseCircle,
 ): boolean {
   const maxDistance = a.radius + b.radius;
-  return (
-    Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) < maxDistance
-  );
+  return vecDistance(a, b) < maxDistance;
 }
