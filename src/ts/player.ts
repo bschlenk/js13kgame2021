@@ -4,6 +4,7 @@ import {
   UniverseCircle,
   UniversePlayer,
 } from './universe';
+import { removeFromArray } from './utils';
 
 export function handlePlayerInteraction(
   _player: UniversePlayer,
@@ -11,11 +12,9 @@ export function handlePlayerInteraction(
   universe: Universe,
 ) {
   const universeObjects = universe.objects;
+
   if (isUniverseCollectible(circle)) {
     universe.points += circle.points;
-    const index = universeObjects.indexOf(circle);
-    if (index > -1) {
-      universeObjects.splice(index, 1);
-    }
+    removeFromArray(universeObjects, circle);
   }
 }

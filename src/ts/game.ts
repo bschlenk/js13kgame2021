@@ -15,6 +15,7 @@ import {
   Universe,
   UniverseCollectible,
 } from './universe';
+import { removeFromArray } from './utils';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
@@ -198,17 +199,11 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       ) {
         if (doCirclesIntersect(universeObject, moveableObject)) {
           console.log('Collision!');
-          const index = universeObjects.indexOf(moveableObject);
-          if (index > -1) {
-            universeObjects.splice(index, 1);
-          }
+          removeFromArray(universeObjects, moveableObject);
 
           // Check if the other object should go away too
           if (!universeObject.isFixed) {
-            const index = universeObjects.indexOf(universeObject);
-            if (index > -1) {
-              universeObjects.splice(index, 1);
-            }
+            removeFromArray(universeObjects, universeObject);
           }
         }
       }
