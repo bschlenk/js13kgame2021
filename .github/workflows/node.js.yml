@@ -18,3 +18,14 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run release
+
+  gh-pages:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: JamesIves/github-pages-deploy-action@4
+        with:
+          branch: gh-pages
+          folder: dist
