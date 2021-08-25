@@ -4,11 +4,8 @@ import {
   UniverseCircle,
   UniversePlayer,
 } from './universe';
-import {
-  removeFromArray,
-  vecAngleBetween,
-  vecFromAngleAndScale,
-} from './utils';
+import { removeFromArray } from './utils';
+import { vecAngleBetween, vecFromAngleAndScale } from './vector';
 
 export function handlePlayerInteraction(
   player: UniversePlayer,
