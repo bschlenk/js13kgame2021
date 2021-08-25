@@ -18,6 +18,10 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run release
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
 
   gh-pages:
     runs-on: ubuntu-latest
@@ -25,6 +29,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist
       - uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
