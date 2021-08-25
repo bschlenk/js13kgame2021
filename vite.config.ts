@@ -17,7 +17,7 @@ export default defineConfig({
     terserOptions: {
       mangle: {
         properties: {
-          builtins: true,
+          builtins: false,
           reserved: [],
         },
       },
