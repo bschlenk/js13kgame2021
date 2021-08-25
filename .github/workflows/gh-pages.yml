@@ -1,13 +1,11 @@
-name: Node.js CI
+name: gh-pages
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build:
+  gh-pages:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,4 +15,8 @@ jobs:
           node-version: 16.x
           cache: 'npm'
       - run: npm ci
-      - run: npm run release
+      - run: npm run build
+      - uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: dist
