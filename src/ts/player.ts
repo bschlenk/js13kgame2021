@@ -1,8 +1,8 @@
 import {
-  isCollectible,
   Universe,
   UniverseCircle,
   UniversePlayer,
+  UniverseCollectible,
 } from './universe';
 
 export function handlePlayerInteraction(
@@ -11,7 +11,7 @@ export function handlePlayerInteraction(
   universe: Universe,
 ) {
   const universeObjects = universe.objects;
-  if (isCollectible(circle)) {
+  if (circle instanceof UniverseCollectible) {
     universe.points += circle.points;
     const index = universeObjects.indexOf(circle);
     if (index > -1) {
