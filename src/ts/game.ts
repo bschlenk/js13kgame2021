@@ -17,7 +17,8 @@ import {
   Universe,
   UniverseCollectible,
 } from './universe';
-import { removeFromArray, vecFromAngleAndScale } from './utils';
+import { removeFromArray } from './utils';
+import { vecFromAngleAndScale } from './vector';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;

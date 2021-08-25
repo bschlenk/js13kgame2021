@@ -1,5 +1,5 @@
 import { UniverseCircle } from './universe';
-import { vecDistance } from './utils';
+import { vecDistance } from './vector';
 
 export function doCirclesIntersect(
   a: UniverseCircle,
