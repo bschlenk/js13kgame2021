@@ -1,12 +1,16 @@
 import { Universe, UniverseCircle, UniversePlayer } from './universe';
 import { handlePlayerInteraction } from './player';
+import { vecDistance } from './vector';
+import { removeFromArray } from './utils';
 
-function doCirclesIntersect(a: UniverseCircle, b: UniverseCircle): boolean {
+export function doCirclesIntersect(
+  a: UniverseCircle,
+  b: UniverseCircle,
+): boolean {
   const maxDistance = a.radius + b.radius;
-  return (
-    Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) < maxDistance
-  );
+  return vecDistance(a.pos, b.pos) < maxDistance;
 }
+
 export function checkForCollisions(
   moveableObject: UniverseCircle,
   universe: Universe,
@@ -36,17 +40,11 @@ export function checkForCollisions(
     ) {
       if (doCirclesIntersect(universeObject, moveableObject)) {
         console.log('Collision!');
-        const index = universeObjects.indexOf(moveableObject);
-        if (index > -1) {
-          universeObjects.splice(index, 1);
-        }
+        removeFromArray(universeObjects, moveableObject);
 
         // Check if the other object should go away too
         if (!universeObject.isFixed) {
-          const index = universeObjects.indexOf(universeObject);
-          if (index > -1) {
-            universeObjects.splice(index, 1);
-          }
+          removeFromArray(universeObjects, universeObject);
         }
       }
     }

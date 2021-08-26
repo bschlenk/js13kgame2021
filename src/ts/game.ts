@@ -16,6 +16,7 @@ import {
   Debris,
   Asteroid,
 } from './universe';
+import { vecFromAngleAndScale } from './vector';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
@@ -78,7 +79,9 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       player.jumpCharge = 0;
       player.jumpChargeDirection = 1;
       player.isFixed = false;
-      player.velocity.dy = charge * 0.002;
+      const { x, y } = vecFromAngleAndScale(player.orientation, charge * 0.002);
+      player.velocity.dx = x;
+      player.velocity.dy = y;
     }
   }
 
@@ -105,8 +108,8 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
 
       /** Prevent division by zero */
       const minDelta = 0.00000001;
-      const xDelta = objectWithMass.x - moveableObject.x || minDelta;
-      const yDelta = objectWithMass.y - moveableObject.y || minDelta;
+      const xDelta = objectWithMass.pos.x - moveableObject.pos.x || minDelta;
+      const yDelta = objectWithMass.pos.y - moveableObject.pos.y || minDelta;
       const distSq = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
 
       /** Gravitational Constant */
@@ -126,8 +129,8 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       moveableObject.orientation = Math.atan2(accY, accX);
     }
 
-    moveableObject.x += moveableObject.velocity.dx * timeDeltaMs;
-    moveableObject.y += moveableObject.velocity.dy * timeDeltaMs;
+    moveableObject.pos.x += moveableObject.velocity.dx * timeDeltaMs;
+    moveableObject.pos.y += moveableObject.velocity.dy * timeDeltaMs;
 
     // Search each of our objects to ensure we don't have any collisions
     checkForCollisions(moveableObject, universe);
@@ -159,7 +162,7 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   const timeSinceLastFrame = time - lastFrame;
   lastFrame = time;
 
-  console.debug(`FPS: ${1000 / timeSinceLastFrame}`);
+  //console.debug(`FPS: ${1000 / timeSinceLastFrame}`);
 
   // Run physics engine
   updateUniverse(universe, timeSinceLastFrame);
@@ -172,15 +175,15 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
       canvasContext.fillStyle = createVerticalGradient(
         universeObject.texture,
         '#000',
-        universeObject.x,
-        universeObject.y,
+        universeObject.pos.x,
+        universeObject.pos.y,
         universeObject.radius * 2,
         universeObject.radius * 2,
         universeObject.orientation,
       );
       canvasContext.arc(
-        universeObject.x,
-        universeObject.y,
+        universeObject.pos.x,
+        universeObject.pos.y,
         universeObject.radius,
         0,
         2 * Math.PI,
@@ -189,13 +192,13 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
     }
 
     if (universeObject instanceof UniversePlayer) {
-      const { x, y, jumpCharge: charge, radius } = universeObject;
+      const { pos, jumpCharge: charge, radius } = universeObject;
 
       if (!charge) return;
 
       canvasContext.fillStyle = '#e43';
-      const xPos = x + radius + 10;
-      const yPos = y - charge;
+      const xPos = pos.x + radius + 10;
+      const yPos = pos.y - charge;
       canvasContext.fillRect(xPos, yPos, 10, charge);
     }
   });

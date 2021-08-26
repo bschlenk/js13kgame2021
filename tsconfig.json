@@ -11,7 +11,9 @@
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    // Disables transformation of classes, adding to the prelude
+    "useDefineForClassFields": false
   },
   "ts-node": {
     "compilerOptions": {

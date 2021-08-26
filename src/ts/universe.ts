@@ -1,22 +1,25 @@
 /** The texture to render as. This may become a more complicated type union in the future */
 type Texture = string;
 
-/** The most basic building block of objects in the universe */
-class UniverseObject {
-  x: number;
-  y: number;
-  isFixed: boolean;
-
-  constructor(x = 1, y = 1) {
-    this.x = x;
-    this.y = y;
-    this.isFixed = true;
-  }
-}
-
 interface Velocity {
   dx: number;
   dy: number;
+}
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+/** The most basic building block of objects in the universe */
+class UniverseObject {
+  pos: Position;
+  isFixed: boolean;
+
+  constructor(x = 1, y = 1) {
+    this.pos = { x, y };
+    this.isFixed = true;
+  }
 }
 
 /** An object with mass, but does not require that it takes up space. E.g. black holes */
@@ -53,8 +56,7 @@ class UniverseCollectible extends UniverseCircle {
 
   constructor(x: number, y: number) {
     super();
-    this.x = x;
-    this.y = y;
+    this.pos = { x, y };
     this.mass = 0;
     this.isFixed = true;
     this.points = 1;
@@ -66,11 +68,11 @@ class UniversePlayer extends UniverseCircle {
   jumpCharge: number;
   jumpChargeDirection: 1 | -1;
   velocity: Velocity;
+  planet: Planet | null;
 
   constructor(x: number, y: number) {
     super();
-    this.x = x;
-    this.y = y;
+    this.pos = { x, y };
     this.radius = 10;
     this.texture = '#fff';
     this.isFixed = true;
@@ -78,6 +80,7 @@ class UniversePlayer extends UniverseCircle {
     this.jumpChargeDirection = 1;
     this.jumpCharge = 0;
     this.mass = 5;
+    this.planet = null;
   }
 }
 
@@ -85,8 +88,7 @@ class UniversePlayer extends UniverseCircle {
 class Planet extends UniverseCircle {
   constructor(x: number, y: number, texture: Texture) {
     super();
-    this.x = x;
-    this.y = y;
+    this.pos = { x, y };
     this.texture = texture;
     this.isFixed = true;
     this.radius = 30;
@@ -116,8 +118,7 @@ class Debris extends UniverseCollectible {
 class Asteroid extends UniverseCircle {
   constructor(x: number, y: number) {
     super();
-    this.x = x;
-    this.y = y;
+    this.pos = { x, y };
     this.mass = 5;
     this.radius = 5;
     this.texture = '#d55';
@@ -137,6 +138,7 @@ interface Universe {
 }
 
 export {
+  Position,
   Universe,
   Texture,
   UniverseObject,
