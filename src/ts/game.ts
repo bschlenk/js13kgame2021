@@ -5,11 +5,12 @@ import {
   clearCanvas,
   createVerticalGradient,
 } from './canvas';
-import { checkForCollisions } from './collision';
+import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
 import { updateDebris } from './update';
 import {
   Universe,
+  UniverseObjectWithMass,
   UniverseCircle,
   UniversePlayer,
   Planet,
@@ -36,16 +37,18 @@ const universe: Universe = {
 };
 
 // Generate space debris with planets as the base
+let debrisInTheTrunk = [];
 universe.objects.forEach((element) => {
   if (element instanceof Planet) {
     // Generate anywhere from 10-20 particles randomly
     const particleCount = Math.floor(Math.random() * 10 + 10);
-    const debrisInTheTrunk = new Array(particleCount)
+    const newDebrisInTheTrunk = new Array(particleCount)
       .fill(0)
       .map((_) => new Debris(element));
-    universe.objects = universe.objects.concat(debrisInTheTrunk);
+    debrisInTheTrunk = debrisInTheTrunk.concat(newDebrisInTheTrunk);
   }
 });
+universe.objects = universe.objects.concat(debrisInTheTrunk);
 
 /**
  * Implementation inspired by https://css-tricks.com/creating-your-own-gravity-and-space-simulator
@@ -80,13 +83,15 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       player.jumpChargeDirection = 1;
       player.isFixed = false;
       const { x, y } = vecFromAngleAndScale(player.orientation, charge * 0.002);
-      player.velocity.dx = x;
-      player.velocity.dy = y;
+      player.vector.dx = x;
+      player.vector.dy = y;
     }
   }
 
   // This should be re-used later to calculate acceleration for moveable objects
-  const objectsWithMass = universeObjects.filter((object) => 'mass' in object);
+  const objectsWithMass = universeObjects.filter(
+    (object) => object instanceof UniverseObjectWithMass,
+  ) as UniverseObjectWithMass[];
   const moveableObjects = objectsWithMass.filter(
     (object) => !object.isFixed,
   ) as UniverseCircle[];
@@ -97,7 +102,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       return;
     }
 
-    moveableObject.velocity = moveableObject.velocity ?? { dx: 0, dy: 0 };
+    moveableObject.vector = moveableObject.vector ?? { dx: 0, dy: 0 };
 
     let accX = 0;
     let accY = 0;
@@ -108,8 +113,10 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
 
       /** Prevent division by zero */
       const minDelta = 0.00000001;
-      const xDelta = objectWithMass.pos.x - moveableObject.pos.x || minDelta;
-      const yDelta = objectWithMass.pos.y - moveableObject.pos.y || minDelta;
+      const xDelta =
+        objectWithMass.vector.x - moveableObject.vector.x || minDelta;
+      const yDelta =
+        objectWithMass.vector.y - moveableObject.vector.y || minDelta;
       const distSq = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
 
       /** Gravitational Constant */
@@ -122,18 +129,18 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       accX += xDelta * f;
       accY += yDelta * f;
     });
-    moveableObject.velocity.dx += accX * timeDeltaMs;
-    moveableObject.velocity.dy += accY * timeDeltaMs;
+    moveableObject.vector.dx += accX * timeDeltaMs;
+    moveableObject.vector.dy += accY * timeDeltaMs;
 
     if (moveableObject instanceof UniverseCircle) {
       moveableObject.orientation = Math.atan2(accY, accX);
     }
 
-    moveableObject.pos.x += moveableObject.velocity.dx * timeDeltaMs;
-    moveableObject.pos.y += moveableObject.velocity.dy * timeDeltaMs;
+    moveableObject.vector.x += moveableObject.vector.dx * timeDeltaMs;
+    moveableObject.vector.y += moveableObject.vector.dy * timeDeltaMs;
 
     // Search each of our objects to ensure we don't have any collisions
-    checkForCollisions(moveableObject, universe);
+    handleCollisions(moveableObject, universe);
   });
 }
 
@@ -152,17 +159,15 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
 
   // Temporary code to randomly add in asteroids every second
   if (Math.floor(time / 1000) - Math.floor(lastFrame / 1000)) {
-    const ast = new Asteroid(
-      Math.random() * canvas.width,
-      Math.random() * canvas.height,
+    universeObjects.push(
+      new Asteroid(Math.random() * canvas.width, Math.random() * canvas.height),
     );
-    universeObjects.push(ast);
   }
 
   const timeSinceLastFrame = time - lastFrame;
   lastFrame = time;
 
-  //console.debug(`FPS: ${1000 / timeSinceLastFrame}`);
+  console.debug(`FPS: ${1000 / timeSinceLastFrame}`);
 
   // Run physics engine
   updateUniverse(universe, timeSinceLastFrame);
@@ -175,15 +180,15 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
       canvasContext.fillStyle = createVerticalGradient(
         universeObject.texture,
         '#000',
-        universeObject.pos.x,
-        universeObject.pos.y,
+        universeObject.vector.x,
+        universeObject.vector.y,
         universeObject.radius * 2,
         universeObject.radius * 2,
         universeObject.orientation,
       );
       canvasContext.arc(
-        universeObject.pos.x,
-        universeObject.pos.y,
+        universeObject.vector.x,
+        universeObject.vector.y,
         universeObject.radius,
         0,
         2 * Math.PI,
@@ -192,13 +197,13 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
     }
 
     if (universeObject instanceof UniversePlayer) {
-      const { pos, jumpCharge: charge, radius } = universeObject;
+      const { vector, jumpCharge: charge, radius } = universeObject;
 
       if (!charge) return;
 
       canvasContext.fillStyle = '#e43';
-      const xPos = pos.x + radius + 10;
-      const yPos = pos.y - charge;
+      const xPos = vector.x + radius + 10;
+      const yPos = vector.y - charge;
       canvasContext.fillRect(xPos, yPos, 10, charge);
     }
   });

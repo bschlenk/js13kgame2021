@@ -8,10 +8,10 @@ export function doCirclesIntersect(
   b: UniverseCircle,
 ): boolean {
   const maxDistance = a.radius + b.radius;
-  return vecDistance(a.pos, b.pos) < maxDistance;
+  return vecDistance(a.vector, b.vector) < maxDistance;
 }
 
-export function checkForCollisions(
+export function handleCollisions(
   moveableObject: UniverseCircle,
   universe: Universe,
 ) {

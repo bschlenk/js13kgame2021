@@ -1,6 +1,6 @@
-import { Position } from './universe';
+import { Vector } from './universe';
 
-export function vecDistance(a: Position, b: Position) {
+export function vecDistance(a: Vector, b: Vector) {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 }
 
@@ -8,7 +8,7 @@ export function vecAngle(x: number, y: number) {
   return Math.atan2(y, x);
 }
 
-export function vecAngleBetween(a: Position, b: Position) {
+export function vecAngleBetween(a: Vector, b: Vector) {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
   return vecAngle(dx, dy);
