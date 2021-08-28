@@ -37,7 +37,7 @@ const universe: Universe = {
 };
 
 // Generate space debris with planets as the base
-let debrisInTheTrunk = [];
+let debrisInTheTrunk = [] as Debris[];
 universe.objects.forEach((element) => {
   if (element instanceof Planet) {
     // Generate anywhere from 10-20 particles randomly
