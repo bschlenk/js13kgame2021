@@ -19,19 +19,18 @@ export function handlePlayerInteraction(
     removeFromArray(universeObjects, circle);
   }
 
-  // TODO: need better test for planet
   if (circle instanceof Planet) {
     // this is a planet, we want to land on it
     player.isFixed = true;
-    player.orientation = vecAngleBetween(player.pos, circle.pos);
+    player.orientation = vecAngleBetween(player.vector, circle.vector);
 
     const dist = player.radius + circle.radius;
     const { x, y } = vecFromAngleAndScale(player.orientation, dist);
 
-    player.pos.x = circle.pos.x + x;
-    player.pos.y = circle.pos.y + y;
+    player.vector.x = circle.vector.x + x;
+    player.vector.y = circle.vector.y + y;
 
-    player.velocity.dx = 0;
-    player.velocity.dy = 0;
+    player.vector.dx = 0;
+    player.vector.dy = 0;
   }
 }

@@ -1,23 +1,20 @@
 /** The texture to render as. This may become a more complicated type union in the future */
 type Texture = string;
 
-interface Velocity {
+interface Vector {
+  x: number;
+  y: number;
   dx: number;
   dy: number;
 }
 
-interface Position {
-  x: number;
-  y: number;
-}
-
 /** The most basic building block of objects in the universe */
 class UniverseObject {
-  pos: Position;
+  vector: Vector;
   isFixed: boolean;
 
-  constructor(x = 1, y = 1) {
-    this.pos = { x, y };
+  constructor(x: number, y: number) {
+    this.vector = { x, y, dx: 0, dy: 0 };
     this.isFixed = true;
   }
 }
@@ -25,13 +22,10 @@ class UniverseObject {
 /** An object with mass, but does not require that it takes up space. E.g. black holes */
 class UniverseObjectWithMass extends UniverseObject {
   mass: number;
-  /** Pixels per ms */
-  velocity: Velocity;
 
-  constructor() {
-    super();
+  constructor(x: number, y: number) {
+    super(x, y);
     this.mass = 0;
-    this.velocity = { dx: 0, dy: 0 };
   }
 }
 
@@ -42,8 +36,8 @@ class UniverseCircle extends UniverseObjectWithMass {
   /** Rotation of object in radians */
   orientation: number;
 
-  constructor() {
-    super();
+  constructor(x: number, y: number) {
+    super(x, y);
     this.radius = 10;
     this.texture = '#fff';
     this.orientation = 0;
@@ -55,10 +49,7 @@ class UniverseCollectible extends UniverseCircle {
   points: number;
 
   constructor(x: number, y: number) {
-    super();
-    this.pos = { x, y };
-    this.mass = 0;
-    this.isFixed = true;
+    super(x, y);
     this.points = 1;
   }
 }
@@ -67,30 +58,22 @@ class UniverseCollectible extends UniverseCircle {
 class UniversePlayer extends UniverseCircle {
   jumpCharge: number;
   jumpChargeDirection: 1 | -1;
-  velocity: Velocity;
-  planet: Planet | null;
 
   constructor(x: number, y: number) {
-    super();
-    this.pos = { x, y };
+    super(x, y);
     this.radius = 10;
     this.texture = '#fff';
-    this.isFixed = true;
-    this.velocity = { dx: 0, dy: 0 };
     this.jumpChargeDirection = 1;
     this.jumpCharge = 0;
     this.mass = 5;
-    this.planet = null;
   }
 }
 
 /** Planets that we jump between, Debris orbits these **/
 class Planet extends UniverseCircle {
   constructor(x: number, y: number, texture: Texture) {
-    super();
-    this.pos = { x, y };
+    super(x, y);
     this.texture = texture;
-    this.isFixed = true;
     this.radius = 30;
   }
 }
@@ -117,13 +100,12 @@ class Debris extends UniverseCollectible {
 /** Object that hurls through space, potenially colliding with the player **/
 class Asteroid extends UniverseCircle {
   constructor(x: number, y: number) {
-    super();
-    this.pos = { x, y };
+    super(x, y);
+    //this.vector = { x, y, 0.03, 0.03 };
     this.mass = 5;
     this.radius = 5;
     this.texture = '#d55';
     this.isFixed = false;
-    this.velocity = { dx: 0.03, dy: -0.03 };
   }
 }
 
@@ -138,7 +120,7 @@ interface Universe {
 }
 
 export {
-  Position,
+  Vector,
   Universe,
   Texture,
   UniverseObject,
