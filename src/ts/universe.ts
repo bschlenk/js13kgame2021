@@ -1,3 +1,10 @@
+import {
+  canvasContext,
+  createLinearGradient,
+  createRadialGradient,
+  fillRect,
+} from './canvas';
+
 /** The texture to render as. This may become a more complicated type union in the future */
 export type Texture = string;
 
@@ -16,6 +23,11 @@ export class UniverseObject {
   constructor(x: number, y: number) {
     this.vector = { x, y, dx: 0, dy: 0 };
     this.isFixed = true;
+  }
+
+  /** Draws the object to the screen */
+  draw() {
+    // Base implementation does nothing
   }
 }
 
@@ -42,6 +54,27 @@ export class UniverseCircle extends UniverseObjectWithMass {
     this.texture = '#fff';
     this.orientation = 0;
   }
+
+  draw() {
+    canvasContext.beginPath();
+    canvasContext.fillStyle = createLinearGradient(
+      this.texture,
+      '#000',
+      this.vector.x,
+      this.vector.y,
+      this.radius * 2,
+      this.radius * 2,
+      this.orientation,
+    );
+    canvasContext.arc(
+      this.vector.x,
+      this.vector.y,
+      this.radius,
+      0,
+      2 * Math.PI,
+    );
+    canvasContext.fill();
+  }
 }
 
 /** An item the player can collect for points **/
@@ -67,6 +100,22 @@ export class UniversePlayer extends UniverseCircle {
     this.jumpCharge = 0;
     this.mass = 40;
   }
+
+  draw() {
+    super.draw();
+
+    const { vector, jumpCharge: charge, radius, orientation } = this;
+
+    if (!charge) return;
+
+    canvasContext.fillStyle = '#e43';
+    const chargeWidth = radius;
+    const xPos = vector.x + (radius + chargeWidth / 2) * Math.cos(orientation);
+    const yPos = vector.y + (radius + chargeWidth / 2) * Math.sin(orientation);
+    const angle = orientation - Math.PI / 2;
+
+    fillRect(xPos, yPos, chargeWidth, charge, angle);
+  }
 }
 
 /** Planets that we jump between, Debris orbits these **/
@@ -76,6 +125,40 @@ export class Planet extends UniverseCircle {
     this.texture = texture;
     this.radius = 30;
     this.mass = 30;
+  }
+}
+
+export class GoalPlanet extends Planet {
+  goalTexture: string;
+
+  constructor(
+    x: number,
+    y: number,
+    planetTexture: Texture,
+    goalTexture: Texture,
+  ) {
+    super(x, y, planetTexture);
+    this.goalTexture = goalTexture;
+  }
+
+  draw() {
+    super.draw();
+
+    canvasContext.fillStyle = createRadialGradient(
+      'transparent',
+      this.goalTexture,
+      this.vector.x,
+      this.vector.y,
+      this.radius,
+    );
+    canvasContext.arc(
+      this.vector.x,
+      this.vector.y,
+      this.radius,
+      0,
+      2 * Math.PI,
+    );
+    canvasContext.fill();
   }
 }
 
@@ -111,10 +194,5 @@ export class Asteroid extends UniverseCircle {
 
 export interface Universe {
   points: number;
-  objects: (
-    | UniverseObject
-    | UniverseCircle
-    | UniversePlayer
-    | UniverseCollectible
-  )[];
+  objects: UniverseObject[];
 }

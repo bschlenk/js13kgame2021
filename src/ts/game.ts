@@ -1,11 +1,5 @@
 import { Background } from './background';
-import {
-  canvas,
-  canvasContext,
-  clearCanvas,
-  createVerticalGradient,
-  fillRect,
-} from './canvas';
+import { canvas, canvasContext, clearCanvas } from './canvas';
 import * as universes from './universes';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
@@ -29,7 +23,11 @@ let isSpacePressed = false;
 
 const background = new Background();
 
-const universe = universes.sandbox;
+const levels = [universes.level_1, universes.level_2];
+
+let currentLevel = 0;
+
+let universe = levels[currentLevel];
 
 // Generate space debris with planets as the base
 let debrisInTheTrunk = [] as Debris[];
@@ -105,6 +103,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       if (moveableObject === objectWithMass) {
         return;
       }
+
       // Don't let the player be dragged around by asteroids.
       if (moveableObject instanceof UniversePlayer && !objectWithMass.isFixed) {
         return;
@@ -174,44 +173,7 @@ export function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   // Draw
   background.render();
   universeObjects.forEach((universeObject) => {
-    if (universeObject instanceof UniverseCircle) {
-      canvasContext.beginPath();
-      canvasContext.fillStyle = createVerticalGradient(
-        universeObject.texture,
-        '#000',
-        universeObject.vector.x,
-        universeObject.vector.y,
-        universeObject.radius * 2,
-        universeObject.radius * 2,
-        universeObject.orientation,
-      );
-      canvasContext.arc(
-        universeObject.vector.x,
-        universeObject.vector.y,
-        universeObject.radius,
-        0,
-        2 * Math.PI,
-      );
-      canvasContext.fill();
-    }
-
-    if (universeObject instanceof UniversePlayer) {
-      const { vector, jumpCharge: charge, radius } = universeObject;
-
-      if (!charge) return;
-
-      canvasContext.fillStyle = '#e43';
-      const chargeWidth = radius;
-      const xPos =
-        vector.x +
-        (radius + chargeWidth / 2) * Math.cos(universeObject.orientation);
-      const yPos =
-        vector.y +
-        (radius + chargeWidth / 2) * Math.sin(universeObject.orientation);
-      const angle = universeObject.orientation - Math.PI / 2;
-
-      fillRect(xPos, yPos, chargeWidth, charge, angle);
-    }
+    universeObject.draw();
   });
   drawPoints(universe);
 }
@@ -220,6 +182,10 @@ function drawPoints(universe: Universe) {
   canvasContext.fillStyle = '#eee';
   canvasContext.font = '30px sans-serif';
   canvasContext.fillText(`Points: ${universe.points}`, 10, 40);
+}
+
+export function onGoalAchieved() {
+  universe = levels[++currentLevel];
 }
 
 export function pauseGame() {
