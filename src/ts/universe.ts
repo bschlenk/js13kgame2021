@@ -65,7 +65,7 @@ class UniversePlayer extends UniverseCircle {
     this.texture = '#fff';
     this.jumpChargeDirection = 1;
     this.jumpCharge = 0;
-    this.mass = 5;
+    this.mass = 40;
   }
 }
 
@@ -75,6 +75,7 @@ class Planet extends UniverseCircle {
     super(x, y);
     this.texture = texture;
     this.radius = 30;
+    this.mass = 30;
   }
 }
 
@@ -101,8 +102,7 @@ class Debris extends UniverseCollectible {
 class Asteroid extends UniverseCircle {
   constructor(x: number, y: number) {
     super(x, y);
-    //this.vector = { x, y, 0.03, 0.03 };
-    this.mass = 5;
+    this.mass = 3;
     this.radius = 5;
     this.texture = '#d55';
     this.isFixed = false;
