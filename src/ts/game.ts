@@ -81,6 +81,10 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
     }
   }
 
+  universeObjects.forEach((universeObject) =>
+    universeObject.updateSelf(universe, timeDeltaMs),
+  );
+
   // This should be re-used later to calculate acceleration for moveable objects
   const objectsWithMass = universeObjects.filter(
     (object) => object instanceof UniverseObjectWithMass,

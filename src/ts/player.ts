@@ -8,7 +8,7 @@ import {
   GoalPlanet,
 } from './universe';
 import { removeFromArray } from './utils';
-import { vecAngleBetween, vecFromAngleAndScale } from './vector';
+import { vecAngleBetween } from './vector';
 
 export function handlePlayerInteraction(
   player: UniversePlayer,
@@ -21,19 +21,14 @@ export function handlePlayerInteraction(
     removeFromArray(universeObjects, circle);
   }
 
-  if (circle instanceof Planet) {
+  if (circle instanceof Planet && !player.isFixed) {
     // this is a planet, we want to land on it
     player.isFixed = true;
-    player.orientation = vecAngleBetween(player.vector, circle.vector);
-
-    const dist = player.radius + circle.radius;
-    const { x, y } = vecFromAngleAndScale(player.orientation, dist);
-
-    player.vector.x = circle.vector.x + x;
-    player.vector.y = circle.vector.y + y;
-
-    player.vector.dx = 0;
-    player.vector.dy = 0;
+    player.planetAttachment = {
+      planet: circle,
+      orientationOffset:
+        vecAngleBetween(player.vector, circle.vector) - circle.orientation,
+    };
   }
 
   if (circle instanceof GoalPlanet) {

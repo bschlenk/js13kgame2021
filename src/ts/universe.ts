@@ -4,6 +4,7 @@ import {
   createRadialGradient,
   fillRect,
 } from './canvas';
+import { vecFromAngleAndScale } from './vector';
 
 /** The texture to render as. This may become a more complicated type union in the future */
 export type Texture = string;
@@ -18,16 +19,31 @@ export interface Vector {
 /** The most basic building block of objects in the universe */
 export class UniverseObject {
   vector: Vector;
-  isFixed: boolean;
+  #isFixed: boolean;
 
   constructor(x: number, y: number) {
     this.vector = { x, y, dx: 0, dy: 0 };
-    this.isFixed = true;
+    this.#isFixed = true;
   }
 
   /** Draws the object to the screen */
   draw() {
     // Base implementation does nothing
+  }
+
+  /**
+   * Run physics engine for self
+   */
+  updateSelf(_universe: Universe, _timeDeltaMs: DOMHighResTimeStamp) {
+    // nothing by default
+  }
+
+  get isFixed(): boolean {
+    return this.#isFixed;
+  }
+
+  set isFixed(value: boolean) {
+    this.#isFixed = value;
   }
 }
 
@@ -47,12 +63,15 @@ export class UniverseCircle extends UniverseObjectWithMass {
   texture: Texture;
   /** Rotation of object in radians */
   orientation: number;
+  /** Speed of rotation of the circle about its origin in radians per second */
+  rotationSpeed: number;
 
   constructor(x: number, y: number) {
     super(x, y);
     this.radius = 10;
     this.texture = '#fff';
     this.orientation = 0;
+    this.rotationSpeed = 0;
   }
 
   draw() {
@@ -75,6 +94,13 @@ export class UniverseCircle extends UniverseObjectWithMass {
     );
     canvasContext.fill();
   }
+
+  updateSelf(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
+    super.updateSelf(universe, timeDeltaMs);
+    this.orientation =
+      (this.orientation + (this.rotationSpeed * timeDeltaMs) / 1000) %
+      (Math.PI * 2);
+  }
 }
 
 /** An item the player can collect for points **/
@@ -91,6 +117,12 @@ export class UniverseCollectible extends UniverseCircle {
 export class UniversePlayer extends UniverseCircle {
   jumpCharge: number;
   jumpChargeDirection: 1 | -1;
+  planetAttachment: {
+    // The planet attached to
+    planet: Planet;
+    // The offset in radians, relative to the orientation of the planet
+    orientationOffset: number;
+  } | null;
 
   constructor(x: number, y: number) {
     super(x, y);
@@ -99,6 +131,8 @@ export class UniversePlayer extends UniverseCircle {
     this.jumpChargeDirection = 1;
     this.jumpCharge = 0;
     this.mass = 40;
+    this.planetAttachment = null;
+    this.isFixed = false;
   }
 
   draw() {
@@ -116,15 +150,48 @@ export class UniversePlayer extends UniverseCircle {
 
     fillRect(xPos, yPos, chargeWidth, charge, angle);
   }
+
+  updateSelf(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
+    super.updateSelf(universe, timeDeltaMs);
+
+    const attachment = this.planetAttachment;
+    if (attachment !== null) {
+      // The planet may be rotating so we need to move/orient the player relative to it
+      const { planet, orientationOffset } = attachment;
+
+      this.orientation = planet.orientation + orientationOffset;
+
+      const dist = this.radius + planet.radius;
+      const { x, y } = vecFromAngleAndScale(this.orientation, dist);
+
+      this.vector.x = planet.vector.x + x;
+      this.vector.y = planet.vector.y + y;
+
+      this.vector.dx = 0;
+      this.vector.dy = 0;
+    }
+  }
+
+  get isFixed(): boolean {
+    return super.isFixed;
+  }
+
+  set isFixed(value: boolean) {
+    super.isFixed = value;
+    if (value === false) {
+      this.planetAttachment = null;
+    }
+  }
 }
 
 /** Planets that we jump between, Debris orbits these **/
 export class Planet extends UniverseCircle {
-  constructor(x: number, y: number, texture: Texture) {
+  constructor(x: number, y: number, texture: Texture, rotationSpeed = 0) {
     super(x, y);
     this.texture = texture;
     this.radius = 30;
     this.mass = 30;
+    this.rotationSpeed = rotationSpeed;
   }
 }
 
@@ -165,6 +232,7 @@ export class GoalPlanet extends Planet {
 /** Space Debris floating around our planet to be collected for points **/
 export class Debris extends UniverseCollectible {
   planet: Planet;
+  /** Orbit speed in radians per second */
   orbitSpeed: number;
   orbitLocation: number;
   altitude: number;
