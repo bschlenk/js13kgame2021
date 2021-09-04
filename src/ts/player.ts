@@ -8,7 +8,7 @@ import {
   GoalPlanet,
 } from './universe';
 import { removeFromArray } from './utils';
-import { vecAngleBetween } from './vector';
+import { vecAngleBetween, vecEquals } from './vector';
 
 export function handlePlayerInteraction(
   player: UniversePlayer,
@@ -24,10 +24,19 @@ export function handlePlayerInteraction(
   if (circle instanceof Planet && !player.isFixed) {
     // this is a planet, we want to land on it
     player.isFixed = true;
+
+    // This is a special case to aid setting up universes. Place players in the middle of a planet
+    // but orient it in the direction you want it to appear on the planet to begin.
+    let orientationOffset;
+    if (vecEquals(player.vector, circle.vector)) {
+      orientationOffset = player.orientation;
+    } else {
+      orientationOffset =
+        vecAngleBetween(player.vector, circle.vector) - circle.orientation;
+    }
     player.planetAttachment = {
       planet: circle,
-      orientationOffset:
-        vecAngleBetween(player.vector, circle.vector) - circle.orientation,
+      orientationOffset,
     };
   }
 

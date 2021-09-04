@@ -17,3 +17,7 @@ export function vecAngleBetween(a: Vector, b: Vector) {
 export function vecFromAngleAndScale(radians: number, scale = 1) {
   return { x: Math.cos(radians) * scale, y: Math.sin(radians) * scale };
 }
+
+export function vecEquals(a: Vector, b: Vector): boolean {
+  return a.x === b.x && a.y === b.y && a.dx === a.dx && a.dy === b.dy;
+}
