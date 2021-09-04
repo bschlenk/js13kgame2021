@@ -6,6 +6,7 @@ import {
   createVerticalGradient,
   fillRect,
 } from './canvas';
+import * as universes from './universes';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
 import { updateDebris } from './update';
@@ -28,14 +29,7 @@ let isSpacePressed = false;
 
 const background = new Background();
 
-const universe: Universe = {
-  points: 0,
-  objects: [
-    new UniversePlayer(300, 200),
-    new Planet(300, 300, '#f00'),
-    new Planet(600, 300, '#33f'),
-  ],
-};
+const universe = universes.sandbox;
 
 // Generate space debris with planets as the base
 let debrisInTheTrunk = [] as Debris[];
