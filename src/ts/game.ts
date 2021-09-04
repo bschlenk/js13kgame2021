@@ -147,7 +147,7 @@ let isPaused = false;
 
 let lastFrame: DOMHighResTimeStamp = 0;
 
-function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
+export function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   if (isPaused) {
     renderPauseMenu();
     return;
@@ -222,15 +222,15 @@ function drawPoints(universe: Universe) {
   canvasContext.fillText(`Points: ${universe.points}`, 10, 40);
 }
 
-function pauseGame() {
+export function pauseGame() {
   isPaused = true;
 }
 
-function resumeGame() {
+export function resumeGame() {
   isPaused = false;
 }
 
-function onKeyDown(e: KeyboardEvent) {
+export function onKeyDown(e: KeyboardEvent) {
   switch (e.key) {
     case 'Escape': {
       pauseGame();
@@ -250,7 +250,7 @@ function onKeyDown(e: KeyboardEvent) {
   }
 }
 
-function onKeyUp(e: KeyboardEvent) {
+export function onKeyUp(e: KeyboardEvent) {
   switch (e.key) {
     case ' ': {
       e.preventDefault();
@@ -258,5 +258,3 @@ function onKeyUp(e: KeyboardEvent) {
     }
   }
 }
-
-export { onRequestAnimationFrame, pauseGame, resumeGame, onKeyDown, onKeyUp };

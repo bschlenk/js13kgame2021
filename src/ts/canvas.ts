@@ -1,19 +1,19 @@
-const canvas = document.getElementsByTagName('canvas')[0];
-const canvasContext = canvas.getContext('2d')!;
+export const canvas = document.getElementsByTagName('canvas')[0];
+export const canvasContext = canvas.getContext('2d')!;
 
-const BACKGROUND_COLOR = '#121212';
+export const BACKGROUND_COLOR = '#121212';
 
-function resizeCanvas() {
+export function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
 
-function clearCanvas() {
+export function clearCanvas() {
   canvasContext.fillStyle = BACKGROUND_COLOR;
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function fillRect(
+export function fillRect(
   x: number,
   y: number,
   width: number,
@@ -34,7 +34,7 @@ function restoreCanvasTransformation(): void {
 /**
  * Creates a gradient
  */
-function createVerticalGradient(
+export function createVerticalGradient(
   fromColor: string,
   toColor: string,
   x: number,
@@ -53,13 +53,3 @@ function createVerticalGradient(
   gradient.addColorStop(1, toColor);
   return gradient;
 }
-
-export {
-  canvas,
-  canvasContext,
-  fillRect,
-  resizeCanvas,
-  createVerticalGradient,
-  clearCanvas,
-  BACKGROUND_COLOR,
-};
