@@ -37,7 +37,7 @@ universe.objects.forEach((element) => {
     const particleCount = Math.floor(Math.random() * 10 + 10);
     const newDebrisInTheTrunk = new Array(particleCount)
       .fill(0)
-      .map((_) => new Debris(element));
+      .map((_) => new Debris({ x: 1, y: 1, planet: element }));
     debrisInTheTrunk = debrisInTheTrunk.concat(newDebrisInTheTrunk);
   }
 });
@@ -162,7 +162,10 @@ export function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
   // Temporary code to randomly add in asteroids every second
   if (Math.floor(time / 1000) - Math.floor(lastFrame / 1000)) {
     universeObjects.push(
-      new Asteroid(Math.random() * canvas.width, Math.random() * canvas.height),
+      new Asteroid({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+      }),
     );
   }
 
