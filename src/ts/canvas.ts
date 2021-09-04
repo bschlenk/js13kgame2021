@@ -34,7 +34,7 @@ function restoreCanvasTransformation(): void {
 /**
  * Creates a gradient
  */
-export function createVerticalGradient(
+export function createLinearGradient(
   fromColor: string,
   toColor: string,
   x: number,
@@ -49,6 +49,19 @@ export function createVerticalGradient(
     x + Math.cos(angle) * width,
     y + Math.sin(angle) * height,
   );
+  gradient.addColorStop(0, fromColor);
+  gradient.addColorStop(1, toColor);
+  return gradient;
+}
+
+export function createRadialGradient(
+  fromColor: string,
+  toColor: string,
+  x: number,
+  y: number,
+  radius: number,
+): CanvasGradient {
+  const gradient = canvasContext.createRadialGradient(x, y, 0, x, y, radius);
   gradient.addColorStop(0, fromColor);
   gradient.addColorStop(1, toColor);
   return gradient;

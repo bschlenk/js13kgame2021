@@ -1,9 +1,11 @@
+import { onGoalAchieved } from './game';
 import {
   Universe,
   UniverseCircle,
   UniversePlayer,
   UniverseCollectible,
   Planet,
+  GoalPlanet,
 } from './universe';
 import { removeFromArray } from './utils';
 import { vecAngleBetween, vecFromAngleAndScale } from './vector';
@@ -32,5 +34,9 @@ export function handlePlayerInteraction(
 
     player.vector.dx = 0;
     player.vector.dy = 0;
+  }
+
+  if (circle instanceof GoalPlanet) {
+    onGoalAchieved();
   }
 }
