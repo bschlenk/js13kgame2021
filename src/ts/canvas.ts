@@ -13,6 +13,24 @@ function clearCanvas() {
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+function fillRect(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  angleRadians: number,
+) {
+  canvasContext.translate(x, y);
+  canvasContext.rotate(angleRadians);
+  canvasContext.translate(-x, -y);
+  canvasContext.fillRect(x, y, width, height);
+  restoreCanvasTransformation();
+}
+
+function restoreCanvasTransformation(): void {
+  canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+}
+
 /**
  * Creates a gradient
  */
@@ -39,6 +57,7 @@ function createVerticalGradient(
 export {
   canvas,
   canvasContext,
+  fillRect,
   resizeCanvas,
   createVerticalGradient,
   clearCanvas,

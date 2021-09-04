@@ -4,6 +4,7 @@ import {
   canvasContext,
   clearCanvas,
   createVerticalGradient,
+  fillRect,
 } from './canvas';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
@@ -110,6 +111,10 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       if (moveableObject === objectWithMass) {
         return;
       }
+      // Don't let the player be dragged around by asteroids.
+      if (moveableObject instanceof UniversePlayer && !objectWithMass.isFixed) {
+        return;
+      }
 
       /** Prevent division by zero */
       const minDelta = 0.00000001;
@@ -202,9 +207,16 @@ function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
       if (!charge) return;
 
       canvasContext.fillStyle = '#e43';
-      const xPos = vector.x + radius + 10;
-      const yPos = vector.y - charge;
-      canvasContext.fillRect(xPos, yPos, 10, charge);
+      const chargeWidth = radius;
+      const xPos =
+        vector.x +
+        (radius + chargeWidth / 2) * Math.cos(universeObject.orientation);
+      const yPos =
+        vector.y +
+        (radius + chargeWidth / 2) * Math.sin(universeObject.orientation);
+      const angle = universeObject.orientation - Math.PI / 2;
+
+      fillRect(xPos, yPos, chargeWidth, charge, angle);
     }
   });
   drawPoints(universe);
