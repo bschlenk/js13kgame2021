@@ -4,7 +4,7 @@ import { onKeyDown, onKeyUp, onRequestAnimationFrame, pauseGame } from './game';
 /**
  * Do one-time setup work here
  */
-function bootstrap() {
+export function bootstrap() {
   const requestAnimationFrameCallback = (time: DOMHighResTimeStamp) => {
     onRequestAnimationFrame(time);
     requestAnimationFrame(requestAnimationFrameCallback);
@@ -17,5 +17,3 @@ function bootstrap() {
   addEventListener('resize', resizeCanvas);
   resizeCanvas();
 }
-
-export { bootstrap };

@@ -1,6 +1,6 @@
 import { canvas, canvasContext, clearCanvas } from './canvas';
 
-function renderPauseMenu() {
+export function renderPauseMenu() {
   clearCanvas();
   canvasContext.fillStyle = '#222';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
@@ -15,5 +15,3 @@ function drawCenterText(text: string, size: number, yOffset: number) {
   const textWidth = canvasContext.measureText(text).width;
   canvasContext.strokeText(text, middleCanvas - textWidth / 2, yOffset);
 }
-
-export { renderPauseMenu };

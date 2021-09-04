@@ -1,7 +1,7 @@
 /** The texture to render as. This may become a more complicated type union in the future */
-type Texture = string;
+export type Texture = string;
 
-interface Vector {
+export interface Vector {
   x: number;
   y: number;
   dx: number;
@@ -9,7 +9,7 @@ interface Vector {
 }
 
 /** The most basic building block of objects in the universe */
-class UniverseObject {
+export class UniverseObject {
   vector: Vector;
   isFixed: boolean;
 
@@ -20,7 +20,7 @@ class UniverseObject {
 }
 
 /** An object with mass, but does not require that it takes up space. E.g. black holes */
-class UniverseObjectWithMass extends UniverseObject {
+export class UniverseObjectWithMass extends UniverseObject {
   mass: number;
 
   constructor(x: number, y: number) {
@@ -30,7 +30,7 @@ class UniverseObjectWithMass extends UniverseObject {
 }
 
 /** A circle that exists in the universe.  */
-class UniverseCircle extends UniverseObjectWithMass {
+export class UniverseCircle extends UniverseObjectWithMass {
   radius: number;
   texture: Texture;
   /** Rotation of object in radians */
@@ -45,7 +45,7 @@ class UniverseCircle extends UniverseObjectWithMass {
 }
 
 /** An item the player can collect for points **/
-class UniverseCollectible extends UniverseCircle {
+export class UniverseCollectible extends UniverseCircle {
   points: number;
 
   constructor(x: number, y: number) {
@@ -55,7 +55,7 @@ class UniverseCollectible extends UniverseCircle {
 }
 
 /** The user-controllable player, jumps between planets **/
-class UniversePlayer extends UniverseCircle {
+export class UniversePlayer extends UniverseCircle {
   jumpCharge: number;
   jumpChargeDirection: 1 | -1;
 
@@ -70,7 +70,7 @@ class UniversePlayer extends UniverseCircle {
 }
 
 /** Planets that we jump between, Debris orbits these **/
-class Planet extends UniverseCircle {
+export class Planet extends UniverseCircle {
   constructor(x: number, y: number, texture: Texture) {
     super(x, y);
     this.texture = texture;
@@ -80,7 +80,7 @@ class Planet extends UniverseCircle {
 }
 
 /** Space Debris floating around our planet to be collected for points **/
-class Debris extends UniverseCollectible {
+export class Debris extends UniverseCollectible {
   planet: Planet;
   orbitSpeed: number;
   orbitLocation: number;
@@ -99,7 +99,7 @@ class Debris extends UniverseCollectible {
 }
 
 /** Object that hurls through space, potenially colliding with the player **/
-class Asteroid extends UniverseCircle {
+export class Asteroid extends UniverseCircle {
   constructor(x: number, y: number) {
     super(x, y);
     this.mass = 3;
@@ -109,7 +109,7 @@ class Asteroid extends UniverseCircle {
   }
 }
 
-interface Universe {
+export interface Universe {
   points: number;
   objects: (
     | UniverseObject
@@ -118,17 +118,3 @@ interface Universe {
     | UniverseCollectible
   )[];
 }
-
-export {
-  Vector,
-  Universe,
-  Texture,
-  UniverseObject,
-  UniverseObjectWithMass,
-  UniverseCircle,
-  UniversePlayer,
-  UniverseCollectible,
-  Planet,
-  Debris,
-  Asteroid,
-};
