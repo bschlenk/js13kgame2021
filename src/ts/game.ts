@@ -9,7 +9,6 @@ import {
   UniverseObjectWithMass,
   UniverseCircle,
   UniversePlayer,
-  Planet,
   Debris,
   Asteroid,
 } from './universe';
@@ -23,25 +22,16 @@ let isSpacePressed = false;
 
 const background = new Background();
 
-const levels = [universes.level_1, universes.level_2, universes.level_3];
+const levels = [
+  universes.level_1,
+  universes.level_2,
+  universes.level_3,
+  universes.level_4,
+];
 
-let currentLevel = 2;
+let currentLevel = 0;
 
 let universe = levels[currentLevel];
-
-// Generate space debris with planets as the base
-let debrisInTheTrunk = [] as Debris[];
-universe.objects.forEach((element) => {
-  if (element instanceof Planet) {
-    // Generate anywhere from 10-20 particles randomly
-    const particleCount = Math.floor(Math.random() * 10 + 10);
-    const newDebrisInTheTrunk = new Array(particleCount)
-      .fill(0)
-      .map((_) => new Debris({ x: 1, y: 1, planet: element }));
-    debrisInTheTrunk = debrisInTheTrunk.concat(newDebrisInTheTrunk);
-  }
-});
-universe.objects = universe.objects.concat(debrisInTheTrunk);
 
 /**
  * Implementation inspired by https://css-tricks.com/creating-your-own-gravity-and-space-simulator
@@ -193,6 +183,13 @@ function drawPoints(universe: Universe) {
 
 export function onGoalAchieved() {
   universe = levels[++currentLevel];
+}
+
+export function onUniversePointsUpdated(universe: Universe) {
+  const { targetGoalPoints } = universe;
+  if (targetGoalPoints != null && universe.points >= targetGoalPoints) {
+    onGoalAchieved();
+  }
 }
 
 export function pauseGame() {

@@ -1,4 +1,4 @@
-import { onGoalAchieved } from './game';
+import { onGoalAchieved, onUniversePointsUpdated } from './game';
 import {
   Universe,
   UniverseCircle,
@@ -18,6 +18,7 @@ export function handlePlayerInteraction(
   const universeObjects = universe.objects;
   if (circle instanceof UniverseCollectible) {
     universe.points += circle.points;
+    onUniversePointsUpdated(universe);
     removeFromArray(universeObjects, circle);
   }
 
