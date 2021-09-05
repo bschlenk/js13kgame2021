@@ -23,9 +23,9 @@ let isSpacePressed = false;
 
 const background = new Background();
 
-const levels = [universes.level_1, universes.level_2];
+const levels = [universes.level_1, universes.level_2, universes.level_3];
 
-let currentLevel = 0;
+let currentLevel = 2;
 
 let universe = levels[currentLevel];
 
