@@ -216,7 +216,7 @@ export class UniversePlayer extends UniverseCircle {
   }
 }
 
-interface PlanetOptions extends UniverseCircleOptions {
+export interface PlanetOptions extends UniverseCircleOptions {
   isFixed?: true;
 }
 
@@ -317,4 +317,5 @@ export class Asteroid extends UniverseCircle {
 export interface Universe {
   points: number;
   objects: UniverseObject[];
+  targetGoalPoints?: number;
 }
