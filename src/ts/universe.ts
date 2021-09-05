@@ -16,7 +16,7 @@ export interface Vector {
   dy: number;
 }
 
-interface UniverseObjectOptions {
+export interface UniverseObjectOptions {
   x: number;
   y: number;
   dx?: number;
@@ -297,7 +297,7 @@ export class Debris extends UniverseCollectible {
   }
 }
 
-interface AsteroidOptions extends UniverseCircleOptions {
+export interface AsteroidOptions extends UniverseCircleOptions {
   isFixed?: false;
 }
 

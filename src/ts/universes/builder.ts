@@ -8,24 +8,30 @@ import {
   Debris,
 } from '../universe';
 
-export function buildUniverse(options: {
-  targetGoalPoints?: number;
-  objects: UniverseObject[];
-}): Universe {
-  const { objects } = options;
+export type UniverseBuilder = () => Universe;
 
-  const universe: Universe = {
-    points: 0,
-    objects,
-    targetGoalPoints: options.targetGoalPoints,
+export function buildUniverse(
+  optionBuilder: () => {
+    targetGoalPoints?: number;
+    objects: UniverseObject[];
+  },
+): UniverseBuilder {
+  return () => {
+    const options = optionBuilder();
+    const { objects } = options;
+    const universe: Universe = {
+      points: 0,
+      objects,
+      targetGoalPoints: options.targetGoalPoints,
+    };
+
+    const player = objects.find(
+      (object) => object instanceof UniversePlayer,
+    )! as UniversePlayer;
+    handleCollisions(player, universe);
+
+    return universe;
   };
-
-  const player = objects.find(
-    (object) => object instanceof UniversePlayer,
-  )! as UniversePlayer;
-  handleCollisions(player, universe);
-
-  return universe;
 }
 
 export function planetWithDebris(

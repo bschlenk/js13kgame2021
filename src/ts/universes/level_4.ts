@@ -1,7 +1,7 @@
-import { Universe, UniversePlayer } from '../universe';
-import { buildUniverse, planetWithDebris } from './builder';
+import { UniversePlayer } from '../universe';
+import { buildUniverse, planetWithDebris, UniverseBuilder } from './builder';
 
-export const universe: Universe = buildUniverse({
+export const universe: UniverseBuilder = buildUniverse(() => ({
   targetGoalPoints: 1,
   objects: [
     new UniversePlayer({ x: 300, y: 300, orientation: Math.PI * 1.5 }),
@@ -10,4 +10,4 @@ export const universe: Universe = buildUniverse({
       3,
     ),
   ],
-});
+}));
