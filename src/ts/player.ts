@@ -1,4 +1,4 @@
-import { onGoalAchieved, onUniversePointsUpdated } from './game';
+import { onGoalAchieved, onLose, onUniversePointsUpdated } from './game';
 import {
   Universe,
   UniverseCircle,
@@ -6,6 +6,7 @@ import {
   UniverseCollectible,
   Planet,
   GoalPlanet,
+  Asteroid,
 } from './universe';
 import { removeFromArray } from './utils';
 import { vecAngleBetween, vecEquals } from './vector';
@@ -43,5 +44,9 @@ export function handlePlayerInteraction(
 
   if (circle instanceof GoalPlanet) {
     onGoalAchieved();
+  }
+
+  if (circle instanceof Asteroid) {
+    onLose(universe);
   }
 }

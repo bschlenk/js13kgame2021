@@ -1,5 +1,5 @@
 import { Background } from './background';
-import { canvas, canvasContext, clearCanvas } from './canvas';
+import { canvasContext, clearCanvas } from './canvas';
 import * as universes from './universes';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
@@ -10,7 +10,6 @@ import {
   UniverseCircle,
   UniversePlayer,
   Debris,
-  Asteroid,
 } from './universe';
 import { vecFromAngleAndScale } from './vector';
 
@@ -27,11 +26,12 @@ const levels = [
   universes.level_2,
   universes.level_3,
   universes.level_4,
+  universes.level_5,
 ];
 
 let currentLevel = 0;
 
-let universe = levels[currentLevel];
+let universe: Universe = levels[currentLevel]();
 
 /**
  * Implementation inspired by https://css-tricks.com/creating-your-own-gravity-and-space-simulator
@@ -149,16 +149,6 @@ export function onRequestAnimationFrame(time: DOMHighResTimeStamp) {
 
   const universeObjects = universe.objects;
 
-  // Temporary code to randomly add in asteroids every second
-  if (Math.floor(time / 1000) - Math.floor(lastFrame / 1000)) {
-    universeObjects.push(
-      new Asteroid({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-      }),
-    );
-  }
-
   const timeSinceLastFrame = time - lastFrame;
   lastFrame = time;
 
@@ -182,7 +172,7 @@ function drawPoints(universe: Universe) {
 }
 
 export function onGoalAchieved() {
-  universe = levels[++currentLevel];
+  universe = levels[++currentLevel]();
 }
 
 export function onUniversePointsUpdated(universe: Universe) {
@@ -190,6 +180,10 @@ export function onUniversePointsUpdated(universe: Universe) {
   if (targetGoalPoints != null && universe.points >= targetGoalPoints) {
     onGoalAchieved();
   }
+}
+
+export function onLose(_currentUniverse: Universe) {
+  universe = levels[currentLevel]();
 }
 
 export function pauseGame() {
