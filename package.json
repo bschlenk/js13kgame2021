@@ -3,14 +3,15 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && rm -r dist/assets",
+    "build": "vite build && rm -r dist/assets",
     "serve": "vite preview",
     "prepare": "husky install",
+    "type-check": "tsc",
     "prettier": "prettier . --check",
     "prettier-fix": "prettier . --write",
     "eslint": "eslint .",
     "eslint-fix": "eslint . --fix",
-    "check": "npm run eslint && npm run prettier",
+    "check": "npm run type-check && npm run eslint && npm run prettier",
     "format": "npm run eslint-fix && npm run prettier-fix",
     "check-build-size": "ts-node scripts/check_build_size.ts",
     "release": "npm run check && npm run build && npm run check-build-size"
