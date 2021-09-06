@@ -20,15 +20,12 @@ export function fillRect(
   height: number,
   angleRadians: number,
 ) {
+  canvasContext.save();
   canvasContext.translate(x, y);
   canvasContext.rotate(angleRadians);
   canvasContext.translate(-x, -y);
   canvasContext.fillRect(x, y, width, height);
-  restoreCanvasTransformation();
-}
-
-function restoreCanvasTransformation(): void {
-  canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+  canvasContext.restore();
 }
 
 /**
@@ -65,4 +62,15 @@ export function createRadialGradient(
   gradient.addColorStop(0, fromColor);
   gradient.addColorStop(1, toColor);
   return gradient;
+}
+
+export type Point = [x: number, y: number];
+
+export function fillPath(start: Point, ...points: Point[]) {
+  canvasContext.beginPath();
+  canvasContext.moveTo(...start);
+  points.forEach((p) => {
+    canvasContext.lineTo(...p);
+  });
+  canvasContext.fill();
 }
