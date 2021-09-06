@@ -2,7 +2,7 @@ import {
   canvasContext,
   createLinearGradient,
   createRadialGradient,
-  fillRect,
+  fillPath,
 } from './canvas';
 import { vecFromAngleAndScale } from './vector';
 
@@ -174,13 +174,25 @@ export class UniversePlayer extends UniverseCircle {
 
     if (!charge) return;
 
-    canvasContext.fillStyle = '#e43';
-    const chargeWidth = radius;
-    const xPos = vector.x + (radius + chargeWidth / 2) * Math.cos(orientation);
-    const yPos = vector.y + (radius + chargeWidth / 2) * Math.sin(orientation);
-    const angle = orientation - Math.PI / 2;
+    canvasContext.save();
 
-    fillRect(xPos, yPos, chargeWidth, charge, angle);
+    canvasContext.fillStyle = '#e43';
+    canvasContext.translate(vector.x, vector.y);
+    canvasContext.rotate(orientation - Math.PI / 2);
+
+    const chargeWidth = radius;
+    const halfChargeWidth = chargeWidth / 2;
+    const xPos = -halfChargeWidth;
+    const yPos = radius + halfChargeWidth + charge;
+
+    canvasContext.fillRect(xPos, yPos, chargeWidth, -charge);
+    fillPath(
+      [xPos, yPos],
+      [xPos + chargeWidth, yPos],
+      [0, yPos + halfChargeWidth],
+    );
+
+    canvasContext.restore();
   }
 
   updateSelf(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
