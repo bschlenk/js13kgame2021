@@ -332,7 +332,7 @@ export interface UniverseTextOptions extends UniverseObjectOptions {
 }
 
 export class UniverseText extends UniverseObject {
-  fontSize: number;
+  fontSize?: number;
   text: string;
 
   constructor(options: UniverseTextOptions) {

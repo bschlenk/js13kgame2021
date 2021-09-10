@@ -10,7 +10,7 @@ export const universe: UniverseBuilder = buildUniverse(() => ({
       x: 640,
       y: 450,
       fontSize: 32,
-      text: 'Planets will rotate',
+      text: 'Some planets will rotate',
     }),
     new UniverseText({
       x: 640,
