@@ -1,4 +1,3 @@
-import { resizeCanvas } from './canvas';
 import { onKeyDown, onKeyUp, onRequestAnimationFrame, pauseGame } from './game';
 
 /**
@@ -14,6 +13,4 @@ export function bootstrap() {
   addEventListener('blur', pauseGame);
   addEventListener('keydown', onKeyDown);
   addEventListener('keyup', onKeyUp);
-  addEventListener('resize', resizeCanvas);
-  resizeCanvas();
 }
