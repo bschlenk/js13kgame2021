@@ -12,6 +12,7 @@ import {
   Debris,
 } from './universe';
 import { vecFromAngleAndScale } from './vector';
+import { getLevel, setLevel } from './utils';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
@@ -29,7 +30,7 @@ const levels = [
   universes.level_5,
 ];
 
-let currentLevel = 0;
+let currentLevel = getLevel();
 
 let universe: Universe = levels[currentLevel]();
 
@@ -172,7 +173,8 @@ function drawPoints(universe: Universe) {
 }
 
 export function onGoalAchieved() {
-  universe = levels[++currentLevel]();
+  setLevel(++currentLevel);
+  universe = levels[currentLevel]();
 }
 
 export function onUniversePointsUpdated(universe: Universe) {
@@ -206,6 +208,11 @@ export function onKeyDown(e: KeyboardEvent) {
         resumeGame();
       }
       isSpacePressed = true;
+      return;
+    }
+    case 'r': {
+      setLevel(0);
+      location.reload();
       return;
     }
     default: {
