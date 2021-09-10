@@ -5,10 +5,10 @@ export function removeFromArray<T>(array: T[], find: T) {
   }
 }
 
-export function getLevel() {
-  return window.localStorage.getItem('planethoppers-level') || 0;
+export function getLevel(): number {
+  return parseInt(window.localStorage.getItem('planethoppers-level') || '0');
 }
 
 export function setLevel(level: number) {
-  window.localStorage.setItem('planethoppers-level', level);
+  window.localStorage.setItem('planethoppers-level', level.toString());
 }

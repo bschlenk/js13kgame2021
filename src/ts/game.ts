@@ -32,6 +32,12 @@ const levels = [
 
 let currentLevel = getLevel();
 
+// Don't crash if we beat the game
+if (currentLevel >= levels.length) {
+  setLevel(0);
+  currentLevel = getLevel();
+}
+
 let universe: Universe = levels[currentLevel]();
 
 /**
