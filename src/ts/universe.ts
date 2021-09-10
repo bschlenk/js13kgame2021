@@ -326,6 +326,34 @@ export class Asteroid extends UniverseCircle {
   }
 }
 
+export interface UniverseTextOptions extends UniverseObjectOptions {
+  fontSize: number;
+  text: string;
+}
+
+export class UniverseText extends UniverseObject {
+  fontSize: number;
+  text: string;
+
+  constructor(options: UniverseTextOptions) {
+    super(options);
+    this.fontSize = options.fontSize ?? 12;
+    this.text = options.text;
+  }
+
+  draw() {
+    super.draw();
+    canvasContext.fillStyle = '#EEE';
+    canvasContext.font = `${this.fontSize}px sans-serif`;
+    const textWidth = canvasContext.measureText(this.text).width;
+    canvasContext.fillText(
+      this.text,
+      this.vector.x - textWidth / 2,
+      this.vector.y,
+    );
+  }
+}
+
 export interface Universe {
   points: number;
   objects: UniverseObject[];

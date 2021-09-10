@@ -1,4 +1,4 @@
-import { GoalPlanet, Planet, UniversePlayer } from '../universe';
+import { GoalPlanet, Planet, UniversePlayer, UniverseText } from '../universe';
 import { AsteroidSpawner } from '../universe/asteroid_spawner';
 import { buildUniverse, UniverseBuilder } from './builder';
 
@@ -21,5 +21,11 @@ export const universe: UniverseBuilder = buildUniverse(() => ({
     }),
     new Planet({ x: 300, y: 300, texture: '#0f0', rotationSpeed: 1 }),
     new GoalPlanet({ x: 600, y: 600, texture: '#333', goalTexture: '#ff0' }),
+    new UniverseText({
+      x: 640,
+      y: 450,
+      fontSize: 32,
+      text: 'Avoid asteroids at all costs!',
+    }),
   ],
 }));
