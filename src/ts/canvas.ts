@@ -3,11 +3,6 @@ export const canvasContext = canvas.getContext('2d')!;
 
 export const BACKGROUND_COLOR = '#121212';
 
-export function resizeCanvas() {
-  canvas.width = 1280;
-  canvas.height = 720;
-}
-
 export function clearCanvas() {
   canvasContext.fillStyle = BACKGROUND_COLOR;
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
