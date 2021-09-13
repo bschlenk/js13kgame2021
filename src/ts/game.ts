@@ -11,7 +11,7 @@ import {
   UniversePlayer,
   Debris,
 } from './universe';
-import { vecFromAngleAndScale } from './vector';
+import { vec, vecFromAngleAndScale } from './vector';
 import { getLevel, setLevel } from './utils';
 
 const MAX_JUMP_CHARGE = 100;
@@ -75,8 +75,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       player.jumpChargeDirection = 1;
       player.isFixed = false;
       const { x, y } = vecFromAngleAndScale(player.orientation, charge * 0.002);
-      player.vector.dx = x;
-      player.vector.dy = y;
+      player.velocity = { x, y };
     }
   }
 
@@ -98,7 +97,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       return;
     }
 
-    moveableObject.vector = moveableObject.vector ?? { dx: 0, dy: 0 };
+    moveableObject.velocity = moveableObject.velocity || vec(0, 0);
 
     let accX = 0;
     let accY = 0;
@@ -115,9 +114,9 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       /** Prevent division by zero */
       const minDelta = 0.00000001;
       const xDelta =
-        objectWithMass.vector.x - moveableObject.vector.x || minDelta;
+        objectWithMass.position.x - moveableObject.position.x || minDelta;
       const yDelta =
-        objectWithMass.vector.y - moveableObject.vector.y || minDelta;
+        objectWithMass.position.y - moveableObject.position.y || minDelta;
       const distSq = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
 
       const f =
@@ -127,15 +126,15 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       accX += xDelta * f;
       accY += yDelta * f;
     });
-    moveableObject.vector.dx += accX * timeDeltaMs;
-    moveableObject.vector.dy += accY * timeDeltaMs;
+    moveableObject.velocity.x += accX * timeDeltaMs;
+    moveableObject.velocity.y += accY * timeDeltaMs;
 
     if (moveableObject instanceof UniverseCircle) {
       moveableObject.orientation = Math.atan2(accY, accX);
     }
 
-    moveableObject.vector.x += moveableObject.vector.dx * timeDeltaMs;
-    moveableObject.vector.y += moveableObject.vector.dy * timeDeltaMs;
+    moveableObject.position.x += moveableObject.velocity.x * timeDeltaMs;
+    moveableObject.position.y += moveableObject.velocity.y * timeDeltaMs;
 
     // Search each of our objects to ensure we don't have any collisions
     handleCollisions(moveableObject, universe);

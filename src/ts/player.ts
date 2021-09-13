@@ -30,11 +30,11 @@ export function handlePlayerInteraction(
     // This is a special case to aid setting up universes. Place players in the middle of a planet
     // but orient it in the direction you want it to appear on the planet to begin.
     let orientationOffset;
-    if (vecEquals(player.vector, circle.vector)) {
+    if (vecEquals(player.position, circle.position)) {
       orientationOffset = player.orientation;
     } else {
       orientationOffset =
-        vecAngleBetween(player.vector, circle.vector) - circle.orientation;
+        vecAngleBetween(player.position, circle.position) - circle.orientation;
     }
     player.planetAttachment = {
       planet: circle,
