@@ -212,6 +212,12 @@ export function onKeyDown(e: KeyboardEvent) {
       location.reload();
       return;
     }
+    case 'n': {
+      if (import.meta.env.DEV) {
+        onGoalAchieved();
+      }
+      return;
+    }
     default: {
       console.debug('Unhandled keypress', e.key);
     }
