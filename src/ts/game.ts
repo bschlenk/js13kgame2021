@@ -28,6 +28,11 @@ const levels = [
   universes.level_3,
   universes.level_4,
   universes.level_5,
+  universes.level_6,
+  universes.level_7,
+  universes.level_8,
+  universes.level_9,
+  universes.level_10,
 ];
 
 let currentLevel = getLevel();
