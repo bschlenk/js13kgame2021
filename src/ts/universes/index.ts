@@ -9,7 +9,7 @@ import { universe as level_7 } from './level_7';
 import { universe as level_8 } from './level_8';
 import { universe as level_9 } from './level_9';
 import { universe as level_10 } from './level_10';
-import { universe as level_10 } from './level_11';
+import { universe as level_11 } from './level_11';
 import { universe as congrats } from './congrats';
 
 export const levels = [
