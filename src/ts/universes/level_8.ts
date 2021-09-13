@@ -2,6 +2,7 @@ import { GoalPlanet, Planet, UniversePlayer } from '../universe';
 import { buildUniverse, planetWithDebris, UniverseBuilder } from './builder';
 
 export const universe: UniverseBuilder = buildUniverse(() => ({
+  targetGoalPoints: 25,
   objects: [
     new UniversePlayer({ x: 400, y: 600, orientation: Math.PI * 1.5 }),
     new Planet({ x: 400, y: 600, texture: '#cfc', rotationSpeed: 1 }),

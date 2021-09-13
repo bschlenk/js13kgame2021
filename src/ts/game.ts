@@ -15,8 +15,8 @@ import { levels } from './universes';
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
 const JUMP_CHARGE_RATE = (MAX_JUMP_CHARGE * 2) / JUMP_CHARGE_CYCLE_TIME_MS;
-const GRAVITATIONAL_CONSTANT = 0.00004;
-const SOFTENING_CONSTANT = 0.5;
+const GRAVITATIONAL_CONSTANT = 0.00002;
+const SOFTENING_CONSTANT = 0.15;
 
 let isSpacePressed = false;
 
