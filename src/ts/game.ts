@@ -17,6 +17,8 @@ import { getLevel, setLevel } from './utils';
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
 const JUMP_CHARGE_RATE = (MAX_JUMP_CHARGE * 2) / JUMP_CHARGE_CYCLE_TIME_MS;
+const GRAVITATIONAL_CONSTANT = 0.00004;
+const SOFTENING_CONSTANT = 0.5;
 
 let isSpacePressed = false;
 
@@ -118,12 +120,9 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
         objectWithMass.vector.y - moveableObject.vector.y || minDelta;
       const distSq = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
 
-      /** Gravitational Constant */
-      const g = 0.00002;
-      const softeningConstant = 0.15;
       const f =
-        (g * moveableObject.mass) /
-        (distSq * Math.sqrt(distSq + softeningConstant));
+        (GRAVITATIONAL_CONSTANT * moveableObject.mass) /
+        (distSq * Math.sqrt(distSq + SOFTENING_CONSTANT));
 
       accX += xDelta * f;
       accY += yDelta * f;
