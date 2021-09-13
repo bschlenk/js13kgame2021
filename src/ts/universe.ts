@@ -290,7 +290,7 @@ export class Debris extends UniverseCollectible {
   constructor(options: DebrisOptions) {
     super({
       ...options,
-      radius: options.radius ?? 3,
+      radius: options.radius ?? 5,
       texture: options.texture ?? '#afa',
       isFixed: false,
     });
