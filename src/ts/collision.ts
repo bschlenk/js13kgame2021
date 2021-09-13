@@ -1,4 +1,4 @@
-import { Universe, UniverseCircle, UniversePlayer } from './universe';
+import { Debris, Universe, UniverseCircle, UniversePlayer } from './universe';
 import { handlePlayerInteraction } from './player';
 import { vecDistance } from './vector';
 import { removeFromArray } from './utils';
@@ -25,6 +25,11 @@ export function handleCollisions(circle: UniverseCircle, universe: Universe) {
       ) {
         handlePlayerInteraction(circle, universeObject, universe);
       }
+      return;
+    }
+
+    if (universeObject instanceof Debris && circle instanceof Debris) {
+      // debris shouldn't collide with eachother
       return;
     }
 
