@@ -1,4 +1,4 @@
-import { Universe, UniverseCircle, UniversePlayer } from './universe';
+import { Debris, Universe, UniverseCircle, UniversePlayer } from './universe';
 import { handlePlayerInteraction } from './player';
 import { vecDistance } from './vector';
 import { removeFromArray } from './utils';
@@ -8,7 +8,7 @@ export function doCirclesIntersect(
   b: UniverseCircle,
 ): boolean {
   const maxDistance = a.radius + b.radius;
-  return vecDistance(a.vector, b.vector) < maxDistance;
+  return vecDistance(a.position, b.position) < maxDistance;
 }
 
 export function handleCollisions(circle: UniverseCircle, universe: Universe) {
@@ -25,6 +25,11 @@ export function handleCollisions(circle: UniverseCircle, universe: Universe) {
       ) {
         handlePlayerInteraction(circle, universeObject, universe);
       }
+      return;
+    }
+
+    if (universeObject instanceof Debris && circle instanceof Debris) {
+      // debris shouldn't collide with eachother
       return;
     }
 

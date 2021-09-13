@@ -1,39 +1,26 @@
 import { Background } from './background';
 import { canvasContext, clearCanvas } from './canvas';
-import * as universes from './universes';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
-import { updateDebris } from './update';
 import {
   Universe,
   UniverseObjectWithMass,
   UniverseCircle,
   UniversePlayer,
-  Debris,
 } from './universe';
-import { vecFromAngleAndScale } from './vector';
+import { vec, vecFromAngleAndScale } from './vector';
 import { getLevel, setLevel } from './utils';
+import { levels } from './universes';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
 const JUMP_CHARGE_RATE = (MAX_JUMP_CHARGE * 2) / JUMP_CHARGE_CYCLE_TIME_MS;
+const GRAVITATIONAL_CONSTANT = 0.00004;
+const SOFTENING_CONSTANT = 0.5;
 
 let isSpacePressed = false;
 
 const background = new Background();
-
-const levels = [
-  universes.level_1,
-  universes.level_2,
-  universes.level_3,
-  universes.level_4,
-  universes.level_5,
-  universes.level_6,
-  universes.level_7,
-  universes.level_8,
-  universes.level_9,
-  universes.level_10,
-];
 
 let currentLevel = getLevel();
 
@@ -78,8 +65,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       player.jumpChargeDirection = 1;
       player.isFixed = false;
       const { x, y } = vecFromAngleAndScale(player.orientation, charge * 0.002);
-      player.vector.dx = x;
-      player.vector.dy = y;
+      player.velocity = { x, y };
     }
   }
 
@@ -96,12 +82,7 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
   ) as UniverseCircle[];
 
   moveableObjects.forEach((moveableObject) => {
-    if (moveableObject instanceof Debris) {
-      updateDebris(moveableObject, timeDeltaMs);
-      return;
-    }
-
-    moveableObject.vector = moveableObject.vector ?? { dx: 0, dy: 0 };
+    moveableObject.velocity = moveableObject.velocity || vec(0, 0);
 
     let accX = 0;
     let accY = 0;
@@ -118,30 +99,27 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
       /** Prevent division by zero */
       const minDelta = 0.00000001;
       const xDelta =
-        objectWithMass.vector.x - moveableObject.vector.x || minDelta;
+        objectWithMass.position.x - moveableObject.position.x || minDelta;
       const yDelta =
-        objectWithMass.vector.y - moveableObject.vector.y || minDelta;
+        objectWithMass.position.y - moveableObject.position.y || minDelta;
       const distSq = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
 
-      /** Gravitational Constant */
-      const g = 0.00002;
-      const softeningConstant = 0.15;
       const f =
-        (g * moveableObject.mass) /
-        (distSq * Math.sqrt(distSq + softeningConstant));
+        (GRAVITATIONAL_CONSTANT * moveableObject.mass) /
+        (distSq * Math.sqrt(distSq + SOFTENING_CONSTANT));
 
       accX += xDelta * f;
       accY += yDelta * f;
     });
-    moveableObject.vector.dx += accX * timeDeltaMs;
-    moveableObject.vector.dy += accY * timeDeltaMs;
+    moveableObject.velocity.x += accX * timeDeltaMs;
+    moveableObject.velocity.y += accY * timeDeltaMs;
 
     if (moveableObject instanceof UniverseCircle) {
       moveableObject.orientation = Math.atan2(accY, accX);
     }
 
-    moveableObject.vector.x += moveableObject.vector.dx * timeDeltaMs;
-    moveableObject.vector.y += moveableObject.vector.dy * timeDeltaMs;
+    moveableObject.position.x += moveableObject.velocity.x * timeDeltaMs;
+    moveableObject.position.y += moveableObject.velocity.y * timeDeltaMs;
 
     // Search each of our objects to ensure we don't have any collisions
     handleCollisions(moveableObject, universe);
@@ -224,6 +202,12 @@ export function onKeyDown(e: KeyboardEvent) {
     case 'r': {
       setLevel(0);
       location.reload();
+      return;
+    }
+    case 'n': {
+      if (import.meta.env.DEV) {
+        onGoalAchieved();
+      }
       return;
     }
     default: {

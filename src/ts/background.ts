@@ -1,4 +1,5 @@
-import { BACKGROUND_COLOR, canvasContext } from './canvas';
+import { BACKGROUND_COLOR, canvasContext, Point } from './canvas';
+import { vec, vecDistance } from './vector';
 
 export class Background {
   timeOffset: number;
@@ -8,13 +9,56 @@ export class Background {
   stars: [x: number, y: number][];
   constructor() {
     this.timeOffset = 0;
-    this.starColor = '#ffe';
+    this.starColor = '#888';
     this.starPixelSize = 3;
     this.animationFrameDurationMs = 200;
-    this.stars = [...Array(100)].map((_) => [
-      Math.round(Math.random() * 2000),
-      Math.round(Math.random() * 2000),
-    ]);
+
+    const stars: [number, number][] = [rand()];
+
+    function rand() {
+      return [Math.random() * 2000, Math.random() * 2000] as Point;
+    }
+
+    function distance(a: Point, b: Point) {
+      return vecDistance(vec(...a), vec(...b));
+    }
+
+    function closest(vec: Point) {
+      let bestDist = Infinity;
+      let best = null;
+      for (const star of stars) {
+        if (!best) {
+          best = star;
+          bestDist = distance(star, vec);
+          continue;
+        }
+        const dist = distance(vec, star);
+        if (dist < bestDist) {
+          best = star;
+          bestDist = dist;
+        }
+      }
+      return best!;
+    }
+
+    function sample() {
+      let bestCandidate: Point;
+      let bestDistance = 0;
+      for (let i = 0; i < 10; ++i) {
+        const c = rand();
+        const d = distance(closest(c), c);
+        if (d > bestDistance) {
+          bestDistance = d;
+          bestCandidate = c;
+        }
+      }
+      return bestCandidate!;
+    }
+
+    for (let i = 1; i < 100; ++i) {
+      stars.push(sample());
+    }
+    this.stars = stars;
   }
 
   update(timeDeltaMs: DOMHighResTimeStamp) {

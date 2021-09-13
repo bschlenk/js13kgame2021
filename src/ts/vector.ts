@@ -1,4 +1,11 @@
-import { Vector } from './universe';
+export interface Vector {
+  x: number;
+  y: number;
+}
+
+export function vec(x: number, y: number) {
+  return { x, y };
+}
 
 export function vecDistance(a: Vector, b: Vector) {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
@@ -15,9 +22,9 @@ export function vecAngleBetween(a: Vector, b: Vector) {
 }
 
 export function vecFromAngleAndScale(radians: number, scale = 1) {
-  return { x: Math.cos(radians) * scale, y: Math.sin(radians) * scale };
+  return vec(Math.cos(radians) * scale, Math.sin(radians) * scale);
 }
 
 export function vecEquals(a: Vector, b: Vector): boolean {
-  return a.x === b.x && a.y === b.y && a.dx === a.dx && a.dy === b.dy;
+  return a.x === b.x && a.y === b.y;
 }

@@ -5,6 +5,7 @@ import {
   UniverseObject,
   UniverseObjectOptions,
 } from '../universe';
+import { vec } from '../vector';
 
 export interface AsteroidSpawnerOptions extends UniverseObjectOptions {
   spawnRatePerSecond: number;
@@ -39,7 +40,7 @@ export class AsteroidSpawner extends UniverseObject {
    */
   updateSelf(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
     super.updateSelf(universe, timeDeltaMs);
-    const { vector, spawnAfterMs, spawnSpeed, spawnDirection } = this;
+    const { position, spawnAfterMs, spawnSpeed, spawnDirection } = this;
     this.#timeSinceLastSpawnMs += timeDeltaMs;
     // console.log(this.#timeSinceLastSpawnMs);
 
@@ -51,10 +52,9 @@ export class AsteroidSpawner extends UniverseObject {
       universe.objects.push(
         new Asteroid({
           ...this.#asteroidOptions,
-          x: vector.x,
-          y: vector.y,
-          dx,
-          dy,
+          x: position.x,
+          y: position.y,
+          velocity: vec(dx, dy),
         }),
       );
     }

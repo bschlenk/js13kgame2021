@@ -4,33 +4,27 @@ import {
   createRadialGradient,
   fillPath,
 } from './canvas';
-import { vecFromAngleAndScale } from './vector';
+import { vec, vecFromAngleAndScale, Vector } from './vector';
 
 /** The texture to render as. This may become a more complicated type union in the future */
 export type Texture = string;
 
-export interface Vector {
-  x: number;
-  y: number;
-  dx: number;
-  dy: number;
-}
-
 export interface UniverseObjectOptions {
   x: number;
   y: number;
-  dx?: number;
-  dy?: number;
+  velocity?: Vector;
   isFixed?: boolean;
 }
 
 /** The most basic building block of objects in the universe */
 export class UniverseObject {
-  vector: Vector;
+  position: Vector;
+  velocity?: Vector;
   #isFixed: boolean;
 
   constructor(options: UniverseObjectOptions) {
-    this.vector = { ...options, dx: options.dx ?? 0, dy: options.dy ?? 0 };
+    this.position = vec(options.x, options.y);
+    this.velocity = options.velocity;
     this.#isFixed = options.isFixed ?? true;
   }
 
@@ -100,15 +94,15 @@ export class UniverseCircle extends UniverseObjectWithMass {
     canvasContext.fillStyle = createLinearGradient(
       this.texture,
       '#000',
-      this.vector.x,
-      this.vector.y,
+      this.position.x,
+      this.position.y,
       this.radius * 2,
       this.radius * 2,
       this.orientation,
     );
     canvasContext.arc(
-      this.vector.x,
-      this.vector.y,
+      this.position.x,
+      this.position.y,
       this.radius,
       0,
       2 * Math.PI,
@@ -170,14 +164,14 @@ export class UniversePlayer extends UniverseCircle {
   draw() {
     super.draw();
 
-    const { vector, jumpCharge: charge, radius, orientation } = this;
+    const { position, jumpCharge: charge, radius, orientation } = this;
 
     if (!charge) return;
 
     canvasContext.save();
 
     canvasContext.fillStyle = '#e43';
-    canvasContext.translate(vector.x, vector.y);
+    canvasContext.translate(position.x, position.y);
     canvasContext.rotate(orientation - Math.PI / 2);
 
     const chargeWidth = radius;
@@ -208,11 +202,10 @@ export class UniversePlayer extends UniverseCircle {
       const dist = this.radius + planet.radius;
       const { x, y } = vecFromAngleAndScale(this.orientation, dist);
 
-      this.vector.x = planet.vector.x + x;
-      this.vector.y = planet.vector.y + y;
+      this.position.x = planet.position.x + x;
+      this.position.y = planet.position.y + y;
 
-      this.vector.dx = 0;
-      this.vector.dy = 0;
+      this.velocity = vec(0, 0);
     }
   }
 
@@ -262,13 +255,13 @@ export class GoalPlanet extends Planet {
     canvasContext.fillStyle = createRadialGradient(
       'transparent',
       this.goalTexture,
-      this.vector.x,
-      this.vector.y,
+      this.position.x,
+      this.position.y,
       this.radius,
     );
     canvasContext.arc(
-      this.vector.x,
-      this.vector.y,
+      this.position.x,
+      this.position.y,
       this.radius,
       0,
       2 * Math.PI,
@@ -297,7 +290,7 @@ export class Debris extends UniverseCollectible {
   constructor(options: DebrisOptions) {
     super({
       ...options,
-      radius: options.radius ?? 3,
+      radius: options.radius ?? 5,
       texture: options.texture ?? '#afa',
       isFixed: false,
     });
@@ -306,6 +299,16 @@ export class Debris extends UniverseCollectible {
       (Math.random() * 0.1 + 0.1) * (Math.random() < 0.5 ? -1 : 1);
     this.orbitLocation = Math.random() * Math.PI * 2;
     this.altitude = Math.random() * 50 + 100;
+  }
+
+  updateSelf(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
+    super.updateSelf(universe, timeDeltaMs);
+
+    this.orbitLocation += this.orbitSpeed * (timeDeltaMs / 1000);
+    this.position.x =
+      this.altitude * Math.cos(this.orbitLocation) + this.planet.position.x;
+    this.position.y =
+      this.altitude * Math.sin(this.orbitLocation) + this.planet.position.y;
   }
 }
 
@@ -323,6 +326,34 @@ export class Asteroid extends UniverseCircle {
       texture: options.texture ?? '#d55',
       isFixed: false,
     });
+  }
+}
+
+export interface UniverseTextOptions extends UniverseObjectOptions {
+  fontSize: number;
+  text: string;
+}
+
+export class UniverseText extends UniverseObject {
+  fontSize?: number;
+  text: string;
+
+  constructor(options: UniverseTextOptions) {
+    super(options);
+    this.fontSize = options.fontSize ?? 12;
+    this.text = options.text;
+  }
+
+  draw() {
+    super.draw();
+    canvasContext.fillStyle = '#EEE';
+    canvasContext.font = `${this.fontSize}px sans-serif`;
+    const textWidth = canvasContext.measureText(this.text).width;
+    canvasContext.fillText(
+      this.text,
+      this.position.x - textWidth / 2,
+      this.position.y,
+    );
   }
 }
 
