@@ -13,5 +13,11 @@ export const universe: UniverseBuilder = buildUniverse(() => ({
       fontSize: 32,
       text: 'Congratulations, you win!',
     }),
+    new UniverseText({
+      x: 640,
+      y: 525,
+      fontSize: 24,
+      text: 'Press "r" to reset your progress',
+    }),
   ],
 }));
