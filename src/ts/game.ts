@@ -3,13 +3,11 @@ import { canvasContext, clearCanvas } from './canvas';
 import * as universes from './universes';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
-import { updateDebris } from './update';
 import {
   Universe,
   UniverseObjectWithMass,
   UniverseCircle,
   UniversePlayer,
-  Debris,
 } from './universe';
 import { vec, vecFromAngleAndScale } from './vector';
 import { getLevel, setLevel } from './utils';
@@ -92,11 +90,6 @@ function updateUniverse(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
   ) as UniverseCircle[];
 
   moveableObjects.forEach((moveableObject) => {
-    if (moveableObject instanceof Debris) {
-      updateDebris(moveableObject, timeDeltaMs);
-      return;
-    }
-
     moveableObject.velocity = moveableObject.velocity || vec(0, 0);
 
     let accX = 0;

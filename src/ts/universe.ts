@@ -300,6 +300,16 @@ export class Debris extends UniverseCollectible {
     this.orbitLocation = Math.random() * Math.PI * 2;
     this.altitude = Math.random() * 50 + 100;
   }
+
+  updateSelf(universe: Universe, timeDeltaMs: DOMHighResTimeStamp) {
+    super.updateSelf(universe, timeDeltaMs);
+
+    this.orbitLocation += this.orbitSpeed * (timeDeltaMs / 1000);
+    this.position.x =
+      this.altitude * Math.cos(this.orbitLocation) + this.planet.position.x;
+    this.position.y =
+      this.altitude * Math.sin(this.orbitLocation) + this.planet.position.y;
+  }
 }
 
 export interface AsteroidOptions extends UniverseCircleOptions {
