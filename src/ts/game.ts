@@ -1,6 +1,5 @@
 import { Background } from './background';
 import { canvasContext, clearCanvas } from './canvas';
-import * as universes from './universes';
 import { handleCollisions } from './collision';
 import { renderPauseMenu } from './menu';
 import {
@@ -11,6 +10,7 @@ import {
 } from './universe';
 import { vec, vecFromAngleAndScale } from './vector';
 import { getLevel, setLevel } from './utils';
+import { levels } from './universes';
 
 const MAX_JUMP_CHARGE = 100;
 const JUMP_CHARGE_CYCLE_TIME_MS = 1000;
@@ -21,14 +21,6 @@ const SOFTENING_CONSTANT = 0.5;
 let isSpacePressed = false;
 
 const background = new Background();
-
-const levels = [
-  universes.level_1,
-  universes.level_2,
-  universes.level_3,
-  universes.level_4,
-  universes.level_5,
-];
 
 let currentLevel = getLevel();
 
